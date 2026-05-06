@@ -82,10 +82,10 @@
 	}
 
 	.field-label {
-		font-size: var(--text-sm);
+		font-size: var(--text-2xs);
 		font-weight: var(--weight-semibold);
 		text-transform: uppercase;
-		letter-spacing: var(--tracking-caps-sm);
+		letter-spacing: var(--tracking-caps);
 		color: var(--color-text-muted);
 	}
 
