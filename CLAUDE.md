@@ -85,8 +85,9 @@ path from routes; use the barrel.
 
 | Component        | Use when                                                                          |
 | ---------------- | --------------------------------------------------------------------------------- |
-| `Field`          | **Every form row.** Wraps an uppercase label around any input. Renders `<label>`. |
-| `Input`          | Text/number input. `size="xl"` for the display amount input pattern.              |
+| `Field`          | **Every form row** with a single bordered control. Wraps an uppercase label around `<input>`/`<textarea>`. Renders `<label>`. **Don't put `<Input size="xl">` inside Field** — Field's CSS clobbers the variant. Use `AmountField` instead. |
+| `AmountField`    | **Currency picker + amount input on one row** (the convert "You send"/"They get" rows, the send AMOUNT row). Bundles SectionLabel + non-wrapping flex row + `<Input size="xl">`. Use this — don't compose by hand. |
+| `Input`          | Text/number input. `size="xl"` for the 36px display amount pattern (only outside Field — see `AmountField`). |
 | `SearchField`    | Magnifier-iconed text input. Use for any "search this list" pattern.              |
 | `CurrencyPicker` | Currency selection — pill trigger + searchable popover. Use anywhere a user picks a currency. |
 | `Button`         | All buttons. Variants: `primary` / `secondary` / `ghost`. Sizes: `sm` / `md`.     |

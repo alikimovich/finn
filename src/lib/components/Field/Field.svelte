@@ -14,6 +14,12 @@
 	- `as` — `'label' | 'div'` (default `'label'`).
 	- `children` — the control.
 
+	**Don't** wrap `<Input size="xl">` or a `<Cluster>` of multiple
+	controls in `<Field as="div">` — Field's `:global(input)` selector
+	clobbers Input variants. For the currency-picker + amount-input
+	pattern, use `<AmountField>`. For a standalone non-form-control
+	wrapped with a Field-style label, use `<SectionLabel>` directly.
+
 	@example
 	```svelte
 	<Field label="Name">
@@ -22,10 +28,6 @@
 
 	<Field label="Email" optional>
 	  <input bind:value={email} type="email" />
-	</Field>
-
-	<Field label="Currency" as="div">
-	  <CurrencyPicker selected={code} onSelect={(c) => (code = c)} />
 	</Field>
 	```
 -->

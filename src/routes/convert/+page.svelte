@@ -1,13 +1,12 @@
 <script lang="ts">
 	import {
+		AmountField,
 		Button,
 		Card,
 		Cluster,
-		CurrencyPicker,
 		DotSep,
 		EmptyState,
 		Icon,
-		Input,
 		List,
 		ListRow,
 		PageHeader,
@@ -114,21 +113,14 @@
 
 <Card padding="lg">
 	<div class="converter">
-		<div class="row">
-			<SectionLabel text="You send" />
-			<Cluster space="4" wrap={false}>
-				<CurrencyPicker selected={from} exclude={to} onSelect={selectFrom} />
-				<Input
-					bind:value={fromAmount}
-					size="xl"
-					align="right"
-					type="text"
-					inputmode="decimal"
-					oninput={onFromInput}
-					aria-label="Amount in {from}"
-				/>
-			</Cluster>
-		</div>
+		<AmountField
+			label="You send"
+			bind:value={fromAmount}
+			currency={from}
+			excludeCurrency={to}
+			onCurrencySelect={selectFrom}
+			oninput={onFromInput}
+		/>
 
 		<div class="divider">
 			<button
@@ -142,21 +134,14 @@
 			</button>
 		</div>
 
-		<div class="row">
-			<SectionLabel text="They get" />
-			<Cluster space="4" wrap={false}>
-				<CurrencyPicker selected={to} exclude={from} onSelect={selectTo} />
-				<Input
-					bind:value={toAmount}
-					size="xl"
-					align="right"
-					type="text"
-					inputmode="decimal"
-					oninput={onToInput}
-					aria-label="Amount in {to}"
-				/>
-			</Cluster>
-		</div>
+		<AmountField
+			label="They get"
+			bind:value={toAmount}
+			currency={to}
+			excludeCurrency={from}
+			onCurrencySelect={selectTo}
+			oninput={onToInput}
+		/>
 	</div>
 
 	<div class="rate-meta">
@@ -225,13 +210,7 @@
 	.converter {
 		display: flex;
 		flex-direction: column;
-	}
-
-	.row {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-1);
-		padding: var(--space-3) 0;
+		gap: var(--space-3);
 	}
 
 	.divider {

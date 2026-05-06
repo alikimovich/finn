@@ -20,7 +20,8 @@ Decision tree for the most common cases:
 - "Vertical column of fields / sections / items"  →  `<Stack>`
 - "Horizontal row of things with a gap"  →  `<Cluster>`
 - "Inline meta line with bullets between items"  →  `<Cluster>` + `<DotSep>`
-- "Form row with a label"  →  `<Field>` (don't wrap `<input>` in your own `<label>`)
+- "Form row with a label + bordered control"  →  `<Field>` (don't wrap `<input>` in your own `<label>`)
+- "Currency picker + amount input on one row"  →  `<AmountField>` (the convert / send amount pattern — never compose by hand from `<Field>` + `<Input size="xl">`; Field's CSS clobbers the xl variant)
 - "User picks a currency"  →  `<CurrencyPicker>` (never `<select>`)
 - "A button"  →  `<Button>` (never raw `<button>`)
 - "An icon"  →  `<Icon>` (never raw `<svg>` in a route)
@@ -255,6 +256,11 @@ skill. **Catch yourself before writing them:**
    Use `<Stack>` or `<Cluster>`.
 8. **Hardcoded `12px`, `#fff`, `rgba(...)`, `200ms`** in CSS. Use the
    token (`var(--space-3)`, `var(--color-text-muted)`, `var(--dur-3)`).
+9. **`<Input>` inside `<Field>`.** Field's CSS targets descendant
+   `<input>` elements and clobbers Input variants — most visibly,
+   `size="xl"`'s 36px borderless display gets reset to 12.5px bordered.
+   Inside a Field, use a bare `<input>`/`<textarea>`. For the
+   currency-picker + amount-input pattern, use `<AmountField>`.
 
 ---
 
@@ -308,26 +314,44 @@ automatically. Don't wrap them in your own `<label>`.
 
 ### An amount row (currency picker + amount input)
 
+Use `<AmountField>`. It bundles the SectionLabel-style label, the
+non-wrapping row, the CurrencyPicker, and the `<Input size="xl">`
+display input — the entire pattern is one primitive.
+
 ```svelte
-<Stack space="2">
-  <SectionLabel text="Amount" />
-  <Cluster space="4" wrap={false}>
-    <CurrencyPicker selected={code} onSelect={(c) => (code = c)} />
-    <Input
-      bind:value={amount}
-      size="xl"
-      align="right"
-      type="text"
-      inputmode="decimal"
-      aria-label="Amount in {code}"
-    />
-  </Cluster>
-</Stack>
+<AmountField
+  label="Amount"
+  bind:value={amount}
+  currency={code}
+  onCurrencySelect={(c) => (code = c)}
+/>
 ```
 
-`wrap={false}` is required — `<Input>` is `width: 100%` and a default
-(wrapping) Cluster will push it to its own line. This matches
-`src/routes/convert/+page.svelte` exactly.
+For a converter pair (two currencies on a swap row):
+
+```svelte
+<AmountField
+  label="You send"
+  bind:value={fromAmount}
+  currency={from}
+  excludeCurrency={to}
+  onCurrencySelect={selectFrom}
+  oninput={onFromInput}
+/>
+<AmountField
+  label="They get"
+  bind:value={toAmount}
+  currency={to}
+  excludeCurrency={from}
+  onCurrencySelect={selectTo}
+  oninput={onToInput}
+/>
+```
+
+Don't compose by hand from `<Field>` + `<Input size="xl">` — Field's
+`:global(input)` selector targets the bare `<input>` element Input
+renders and overrides the 36px display variant with Field's 12.5px
+bordered style. `AmountField` exists to skip that failure mode.
 
 ### An action bar / inline meta line
 
