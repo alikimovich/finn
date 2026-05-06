@@ -116,7 +116,7 @@
 	<div class="converter">
 		<div class="row">
 			<SectionLabel text="You send" />
-			<div class="row-content">
+			<Cluster space="4" wrap={false}>
 				<CurrencyPicker selected={from} exclude={to} onSelect={selectFrom} />
 				<Input
 					bind:value={fromAmount}
@@ -127,7 +127,7 @@
 					oninput={onFromInput}
 					aria-label="Amount in {from}"
 				/>
-			</div>
+			</Cluster>
 		</div>
 
 		<div class="divider">
@@ -144,7 +144,7 @@
 
 		<div class="row">
 			<SectionLabel text="They get" />
-			<div class="row-content">
+			<Cluster space="4" wrap={false}>
 				<CurrencyPicker selected={to} exclude={from} onSelect={selectTo} />
 				<Input
 					bind:value={toAmount}
@@ -155,7 +155,7 @@
 					oninput={onToInput}
 					aria-label="Amount in {to}"
 				/>
-			</div>
+			</Cluster>
 		</div>
 	</div>
 
@@ -232,12 +232,6 @@
 		flex-direction: column;
 		gap: var(--space-1);
 		padding: var(--space-3) 0;
-	}
-
-	.row-content {
-		display: flex;
-		align-items: center;
-		gap: var(--space-4);
 	}
 
 	.divider {

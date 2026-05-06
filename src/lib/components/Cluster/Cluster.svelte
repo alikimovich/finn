@@ -16,6 +16,16 @@
 	<Cluster space="2"><span>1 USD = 0.92 EUR</span><DotSep /><span>updated</span></Cluster>
 	<Cluster justify="between"><h2>Recent</h2><Button variant="ghost">Clear</Button></Cluster>
 	```
+
+	Amount-row pattern — pass `wrap={false}` or the `width: 100%` Input
+	will be pushed to its own line by the default wrapping behavior:
+
+	```svelte
+	<Cluster space="4" wrap={false}>
+		<CurrencyPicker selected={code} onSelect={(c) => (code = c)} />
+		<Input bind:value={amount} size="xl" align="right" />
+	</Cluster>
+	```
 -->
 <script lang="ts" module>
 	export type ClusterSpace = '1' | '2' | '3' | '4' | '5' | '6';

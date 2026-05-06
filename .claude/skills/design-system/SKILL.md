@@ -88,6 +88,13 @@ primitive. Common failure modes from past builds:
      design.
    - Trailing actions (Send button on the right of a card) → wrap in a
      `<Cluster justify="end">` or use the parent's `align="end"`.
+   - **If one child is a full-width control** (`<Input>`, `<Input size="xl">`,
+     `<textarea>`) **and the row should not wrap**, pass `wrap={false}`.
+     Default Cluster wraps, and a `width: 100%` Input next to anything
+     else forces the Input onto its own line. The amount-row pattern
+     (currency picker + amount input on the same row) is
+     `<Cluster space="4" wrap={false}>` — see the Amount row recipe
+     below and `src/routes/convert/+page.svelte` for the live example.
 
 3. **Don't relabel or rephrase copy.** If Figma says "BALANCE", use
    "BALANCE" — even if it reads semantically wrong for the field.
@@ -298,6 +305,29 @@ automatically. Don't wrap them in your own `<label>`.
   </List>
 {/if}
 ```
+
+### An amount row (currency picker + amount input)
+
+```svelte
+<Stack space="2">
+  <SectionLabel text="Amount" />
+  <Cluster space="4" wrap={false}>
+    <CurrencyPicker selected={code} onSelect={(c) => (code = c)} />
+    <Input
+      bind:value={amount}
+      size="xl"
+      align="right"
+      type="text"
+      inputmode="decimal"
+      aria-label="Amount in {code}"
+    />
+  </Cluster>
+</Stack>
+```
+
+`wrap={false}` is required — `<Input>` is `width: 100%` and a default
+(wrapping) Cluster will push it to its own line. This matches
+`src/routes/convert/+page.svelte` exactly.
 
 ### An action bar / inline meta line
 
