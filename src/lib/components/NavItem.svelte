@@ -1,3 +1,22 @@
+<!--
+	@component
+	Used inside `<Sidebar>`. Active state is derived from the current
+	route via `$app/state`. Don't use outside the sidebar.
+
+	Props:
+	- `href` — string (required).
+	- `label` — string (required).
+	- `soon` — boolean (default `false`). Adds a "soon" badge.
+	- Snippet: `icon`.
+
+	@example
+	```svelte
+	<NavItem href="/convert" label="Convert">
+	  {#snippet icon()}<Icon name="convert" />{/snippet}
+	</NavItem>
+	<NavItem href="/send" label="Send" soon>…</NavItem>
+	```
+-->
 <script lang="ts">
 	import { page } from '$app/state';
 	import type { Snippet } from 'svelte';

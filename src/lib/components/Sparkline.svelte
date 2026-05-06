@@ -1,3 +1,19 @@
+<!--
+	@component
+	Tiny line chart of N points, height-normalized. Tone is semantic, not
+	a raw color.
+
+	Props:
+	- `points` — number[] (required). Series to plot.
+	- `width` / `height` — number (optional).
+	- `tone` — `'neutral' | 'up' | 'down'` (default `'neutral'`). Maps to
+	  `--color-text-muted`, `--color-success`, `--color-danger`.
+
+	@example
+	```svelte
+	<Sparkline points={[12, 14, 13, 16, 18]} tone="up" />
+	```
+-->
 <script lang="ts">
 	interface Props {
 		points: number[];

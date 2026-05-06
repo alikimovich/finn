@@ -1,3 +1,24 @@
+<!--
+	@component
+	**Every route page opens with this.** Title + optional subtitle +
+	optional actions snippet on the right.
+
+	Props:
+	- `title` — string (required).
+	- `subtitle` — string (optional).
+	- Snippet: `actions`.
+
+	@example
+	```svelte
+	<PageHeader title="Convert" subtitle="Live FX rates from the European Central Bank." />
+
+	<PageHeader title="Contacts" subtitle="People you send to and receive from.">
+	  {#snippet actions()}
+	    <Button variant="primary"><Icon name="plus" size="sm" />Add contact</Button>
+	  {/snippet}
+	</PageHeader>
+	```
+-->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 

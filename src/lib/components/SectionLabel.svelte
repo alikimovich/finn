@@ -1,3 +1,19 @@
+<!--
+	@component
+	Tiny uppercase label introducing a section (sidebar groups, form
+	section heads, list groupings). Render as `<div>` (default) or `<h2>`
+	for proper page outlines.
+
+	Props:
+	- `text` — string (required).
+	- `as` — `'div' | 'h2'` (default `'div'`).
+
+	@example
+	```svelte
+	<SectionLabel text="Money" />
+	<SectionLabel as="h2" text="Recent" />
+	```
+-->
 <script lang="ts">
 	interface Props {
 		text: string;

@@ -1,3 +1,19 @@
+<!--
+	@component
+	Magnifier-iconed text input. Use for any "search this list"
+	pattern.
+
+	Props:
+	- `value` — string (bindable).
+	- `placeholder` — string.
+	- `variant` — `'card' | 'plain'` (default `'card'`). `card` for stand-alone
+	  use; `plain` for placement inside a popover (no border, divider underneath).
+
+	@example
+	```svelte
+	<SearchField bind:value={query} placeholder="Search contacts" />
+	```
+-->
 <script lang="ts">
 	import Icon from './Icon.svelte';
 

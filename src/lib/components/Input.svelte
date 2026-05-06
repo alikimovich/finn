@@ -1,3 +1,26 @@
+<!--
+	@component
+	Text/number input. Inside a `<Field>`, prefer the bare `<input>` —
+	`<Field>` styles its child `<input>`/`<textarea>` automatically.
+
+	Use `<Input>` directly only when you need its variants outside a
+	field context (e.g. the converter's display amount input uses
+	`size="xl"`).
+
+	Props:
+	- `value` — string | number (bindable).
+	- `size` — `'md' | 'xl'` (default `'md'`). `xl` is the 36px display
+	  variant for the converter amount input — semibold, tabular numerals,
+	  focus-borderless.
+	- `align` — `'left' | 'right'` (default `'left'`).
+	- All native `<input>` attributes (`type`, `placeholder`, etc.).
+
+	@example
+	```svelte
+	<Input bind:value placeholder="…" />
+	<Input bind:value size="xl" align="right" type="number" />
+	```
+-->
 <script lang="ts">
 	import type { HTMLInputAttributes } from 'svelte/elements';
 

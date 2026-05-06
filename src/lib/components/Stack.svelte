@@ -1,3 +1,22 @@
+<!--
+	@component
+	Vertical flex with tokenized gap. Use it whenever you'd otherwise
+	write `display: flex; flex-direction: column; gap: var(--space-N)` —
+	which is most of the time.
+
+	Props:
+	- `space` — `'1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'` (default `'3'`).
+	- `align` — `'start' | 'center' | 'end' | 'stretch'` (default `'stretch'`).
+	- `children` — content.
+
+	@example
+	```svelte
+	<Stack space="4">
+	  <Field label="Name">…</Field>
+	  <Field label="Email">…</Field>
+	</Stack>
+	```
+-->
 <script lang="ts" module>
 	export type StackSpace = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
 </script>

@@ -1,3 +1,27 @@
+<!--
+	@component
+	Pill-shaped trigger (flag + code + chevron) opening a searchable
+	popover of all currencies, with a "Popular" group when no query is
+	active. **Use this anywhere a user picks a currency** — never roll a
+	plain `<select>`.
+
+	Wrap in `<Field as="div" label="…">` for form rows.
+
+	Props:
+	- `selected` — `CurrencyCode` (required).
+	- `onSelect` — `(code: CurrencyCode) => void` (required).
+	- `exclude` — `CurrencyCode` (optional). Hides this currency from the list.
+	- `aria-label` — string (optional).
+
+	@example
+	```svelte
+	<CurrencyPicker selected={code} exclude={otherCode} onSelect={(c) => (code = c)} />
+
+	<Field label="Currency" as="div">
+	  <CurrencyPicker selected={code} onSelect={(c) => (code = c)} />
+	</Field>
+	```
+-->
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { currencies, popularCodes } from '$lib/data/currencies';

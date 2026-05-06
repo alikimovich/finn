@@ -1,3 +1,18 @@
+<!--
+	@component
+	Small uppercase label for status, "soon" hints, or saved confirmations.
+
+	Props:
+	- `variant` — `'neutral' | 'soft' | 'success'` (default `'neutral'`).
+	- `children` — text content.
+
+	@example
+	```svelte
+	<Badge variant="neutral">soon</Badge>
+	<Badge variant="soft">Coming soon</Badge>
+	<Badge variant="success">Saved ✓</Badge>
+	```
+-->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 

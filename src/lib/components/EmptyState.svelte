@@ -1,3 +1,26 @@
+<!--
+	@component
+	Centered empty/zero-data display. Use this for empty lists,
+	no-search-results states, and "coming soon" placeholders. Don't roll
+	your own.
+
+	Props:
+	- `title` — string (optional).
+	- `description` — string (optional).
+	- `tone` — `'default' | 'subtle'` (default `'default'`). `subtle` for
+	  inline filter-empty states (e.g. "no results match…").
+	- Snippets: `icon`, `action`.
+
+	@example
+	```svelte
+	<EmptyState title="No contacts yet" description="Add the people you most often send money to.">
+	  {#snippet icon()}<Icon name="user" size="lg" />{/snippet}
+	  {#snippet action()}<Button variant="secondary" size="sm">Add</Button>{/snippet}
+	</EmptyState>
+
+	<EmptyState tone="subtle" description={`No contacts match "${query}".`} />
+	```
+-->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 

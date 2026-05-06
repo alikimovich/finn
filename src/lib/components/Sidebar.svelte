@@ -1,3 +1,8 @@
+<!--
+	@component
+	The fixed app sidebar — brand mark, two nav groups, footer. Used once
+	in `+layout.svelte`. **Don't re-use elsewhere.**
+-->
 <script lang="ts">
 	import NavItem from './NavItem.svelte';
 	import SectionLabel from './SectionLabel.svelte';

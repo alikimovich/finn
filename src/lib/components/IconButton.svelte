@@ -1,3 +1,22 @@
+<!--
+	@component
+	Square icon-only button. Requires `aria-label`. Use for row actions,
+	dialog close, and any "icon as a button" pattern.
+
+	Props:
+	- `variant` — `'default' | 'danger'` (default `'default'`).
+	- `size` — `'sm' | 'md'` (default `'sm'`).
+	- `aria-label` — string (required for accessibility).
+	- All native `<button>` attributes.
+
+	@example
+	```svelte
+	<IconButton aria-label="Edit"><Icon name="edit" size="sm" /></IconButton>
+	<IconButton variant="danger" aria-label="Delete">
+	  <Icon name="trash" size="sm" />
+	</IconButton>
+	```
+-->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';

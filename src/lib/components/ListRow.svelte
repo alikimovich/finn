@@ -1,3 +1,24 @@
+<!--
+	@component
+	The row used in every list across the app. Provides surface
+	(background, border, hover, padding); inner layout is the consumer's
+	responsibility — usually a `<Cluster>` or small grid wrapper. Renders
+	an `<li>` wrapping an inner element selected by `as`.
+
+	Props:
+	- `as` — `'div' | 'a' | 'button'` (default `'div'`).
+	- `padding` — `'sm' | 'md'` (default `'sm'`).
+	- `href` — string (when `as="a"`).
+	- `onclick` — `(e) => void` (when `as="button"`).
+	- `aria-label` — string.
+
+	@example
+	```svelte
+	<ListRow padding="sm">…</ListRow>
+	<ListRow as="a" href="/x" padding="md">…</ListRow>
+	<ListRow as="button" onclick={() => load(item)}>…</ListRow>
+	```
+-->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 

@@ -1,3 +1,29 @@
+<!--
+	@component
+	Modal with backdrop, title bar, body, and optional footer snippet.
+	Dismisses on Escape and backdrop click. Use this for **every** modal —
+	don't roll your own.
+
+	Props:
+	- `open` — boolean (required).
+	- `title` — string (required).
+	- `onClose` — `() => void` (required).
+	- `children` — body content.
+	- Snippet: `footer`.
+
+	@example
+	```svelte
+	<Dialog open={isOpen} title="New contact" onClose={close}>
+	  <form onsubmit={(e) => { e.preventDefault(); save(); }}>
+	    <Stack space="4">…</Stack>
+	  </form>
+	  {#snippet footer()}
+	    <Button variant="ghost" size="sm" onclick={close}>Cancel</Button>
+	    <Button variant="primary" size="sm" onclick={save}>Save</Button>
+	  {/snippet}
+	</Dialog>
+	```
+-->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { tick } from 'svelte';

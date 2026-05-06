@@ -1,3 +1,23 @@
+<!--
+	@component
+	Single-source icon component. **Never put `<svg>` directly in a route
+	or page-level component** — always go through `<Icon>`. To add a new
+	glyph, extend the `IconName` union and the switch in this file.
+
+	Props:
+	- `name` — `IconName` (required). One of: `arrow-right`, `check`,
+	  `chevron-down`, `close`, `convert`, `edit`, `people`, `plus`,
+	  `rates`, `search`, `send`, `stories`, `swap-vertical`, `trash`,
+	  `trend-up`, `user`.
+	- `size` — `'xs' | 'sm' | 'md' | 'lg'` (default `'md'`).
+	- `strokeWidth` — number (default `1.5`).
+
+	@example
+	```svelte
+	<Icon name="convert" />
+	<Icon name="plus" size="sm" strokeWidth={1.6} />
+	```
+-->
 <script lang="ts" module>
 	export type IconName =
 		| 'arrow-right'

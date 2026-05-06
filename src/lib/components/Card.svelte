@@ -1,3 +1,20 @@
+<!--
+	@component
+	Elevated surface for grouping related content. The default container
+	for forms, summaries, and any "panel of stuff."
+
+	Props:
+	- `padding` — `'sm' | 'md' | 'lg'` (default `'md'`). Maps to
+	  `--space-4` / `--space-5` / `--space-6`.
+	- `children` — content.
+
+	@example
+	```svelte
+	<Card padding="lg">
+	  <Stack space="4">…</Stack>
+	</Card>
+	```
+-->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 

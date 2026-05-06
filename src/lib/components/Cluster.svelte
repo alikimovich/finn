@@ -1,3 +1,22 @@
+<!--
+	@component
+	Horizontal flex with tokenized gap; wraps by default. The horizontal
+	counterpart to `<Stack>`. Use it whenever you'd otherwise write
+	`display: flex; gap: var(--space-N)`.
+
+	Props:
+	- `space` — `'1' | '2' | '3' | '4' | '5' | '6'` (default `'2'`).
+	- `align` — `'start' | 'center' | 'end' | 'baseline' | 'stretch'` (default `'center'`).
+	- `justify` — `'start' | 'center' | 'end' | 'between'` (optional).
+	- `wrap` — boolean (default `true`).
+	- `as` — `'div' | 'span'` (default `'div'`).
+
+	@example
+	```svelte
+	<Cluster space="2"><span>1 USD = 0.92 EUR</span><DotSep /><span>updated</span></Cluster>
+	<Cluster justify="between"><h2>Recent</h2><Button variant="ghost">Clear</Button></Cluster>
+	```
+-->
 <script lang="ts" module>
 	export type ClusterSpace = '1' | '2' | '3' | '4' | '5' | '6';
 </script>

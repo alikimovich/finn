@@ -1,3 +1,23 @@
+<!--
+	@component
+	The standard button. Use this for **every** clickable action — never
+	render a raw `<button>` in a route or page-level component. Pair with
+	`<Icon>` for leading-icon buttons.
+
+	Props:
+	- `variant` — `'primary' | 'secondary' | 'ghost'` (default `'primary'`).
+	  Use `primary` for the main action on a screen, `secondary` for
+	  alternates, `ghost` for low-emphasis (e.g. dialog Cancel).
+	- `size` — `'sm' | 'md'` (default `'md'`).
+	- All native `<button>` attributes (`onclick`, `disabled`, `type`, etc.).
+
+	@example
+	```svelte
+	<Button variant="primary" onclick={save}>Save</Button>
+	<Button variant="ghost" size="sm" onclick={close}>Cancel</Button>
+	<Button variant="primary"><Icon name="plus" size="sm" />Add contact</Button>
+	```
+-->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';

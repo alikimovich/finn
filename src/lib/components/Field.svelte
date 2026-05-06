@@ -1,3 +1,34 @@
+<!--
+	@component
+	Form-row wrapper that pairs an uppercase label with any control. Use
+	this for **every form row**. `<input>` and `<textarea>` placed inside
+	are styled automatically — don't wrap them in your own `<label>`.
+
+	Renders `<label>` by default (clicking the label focuses its input);
+	pass `as="div"` when wrapping a non-form-control like
+	`<CurrencyPicker>`.
+
+	Props:
+	- `label` — string (required).
+	- `optional` — boolean (default `false`). Adds an "(optional)" hint.
+	- `as` — `'label' | 'div'` (default `'label'`).
+	- `children` — the control.
+
+	@example
+	```svelte
+	<Field label="Name">
+	  <input bind:value={name} type="text" required />
+	</Field>
+
+	<Field label="Email" optional>
+	  <input bind:value={email} type="email" />
+	</Field>
+
+	<Field label="Currency" as="div">
+	  <CurrencyPicker selected={code} onSelect={(c) => (code = c)} />
+	</Field>
+	```
+-->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 

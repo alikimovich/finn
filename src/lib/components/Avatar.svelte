@@ -1,3 +1,22 @@
+<!--
+	@component
+	Initials avatar with deterministic palette (1 of 7 paired tones derived
+	from a hash of the name).
+
+	Props:
+	- `name` — string: the person's full name (required). Initials are derived
+	  from this; the same name always renders with the same color pair.
+	- `size` — number (default `40`): width/height in px.
+
+	The element is `aria-hidden` — always pair it with the visible name so
+	screen readers don't lose information.
+
+	@example
+	```svelte
+	<Avatar name="Jane Doe" size={40} />
+	<Cluster space="3"><Avatar name={user.name} /><span>{user.name}</span></Cluster>
+	```
+-->
 <script lang="ts">
 	interface Props {
 		name: string;
