@@ -3,8 +3,7 @@
 		points: number[];
 		width?: number;
 		height?: number;
-		stroke?: string;
-		fill?: string;
+		tone?: 'neutral' | 'up' | 'down';
 		strokeWidth?: number;
 	}
 
@@ -12,8 +11,7 @@
 		points,
 		width = 96,
 		height = 28,
-		stroke = 'currentColor',
-		fill = 'none',
+		tone = 'neutral',
 		strokeWidth = 1.5
 	}: Props = $props();
 
@@ -33,11 +31,6 @@
 			})
 			.join(' ');
 	});
-
-	const areaPath = $derived.by(() => {
-		if (!path || fill === 'none') return '';
-		return `${path} L ${width} ${height} L 0 ${height} Z`;
-	});
 </script>
 
 <svg
@@ -46,14 +39,11 @@
 	viewBox="0 0 {width} {height}"
 	role="img"
 	aria-hidden="true"
-	class="sparkline"
+	class="sparkline tone-{tone}"
 >
-	{#if areaPath}
-		<path d={areaPath} {fill} stroke="none" />
-	{/if}
 	<path
 		d={path}
-		{stroke}
+		stroke="currentColor"
 		stroke-width={strokeWidth}
 		fill="none"
 		stroke-linecap="round"
@@ -65,5 +55,17 @@
 <style>
 	.sparkline {
 		display: block;
+	}
+
+	.tone-neutral {
+		color: var(--color-text-muted);
+	}
+
+	.tone-up {
+		color: var(--color-success);
+	}
+
+	.tone-down {
+		color: var(--color-danger);
 	}
 </style>

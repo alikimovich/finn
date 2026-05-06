@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import type { Snippet } from 'svelte';
+	import Badge from './Badge.svelte';
 
 	interface Props {
 		href: string;
@@ -24,7 +25,7 @@
 	{/if}
 	<span class="label">{label}</span>
 	{#if soon}
-		<span class="soon">soon</span>
+		<Badge variant="neutral">soon</Badge>
 	{/if}
 </a>
 
@@ -35,49 +36,40 @@
 		gap: var(--space-3);
 		padding: var(--space-2) var(--space-3);
 		border-radius: var(--radius-sm);
-		color: var(--text-muted);
-		font-weight: 500;
-		font-size: 13.5px;
-		line-height: 1;
-		transition: background-color 120ms ease, color 120ms ease;
+		color: var(--color-text-muted);
+		font-weight: var(--weight-medium);
+		font-size: var(--text-base);
+		line-height: var(--leading-tight);
+		transition:
+			background-color var(--dur-2) var(--ease-standard),
+			color var(--dur-2) var(--ease-standard);
 	}
 
 	.nav-item:hover {
-		background: var(--accent-soft);
-		color: var(--text);
+		background: var(--color-accent-soft);
+		color: var(--color-text);
 	}
 
 	.nav-item.active {
-		background: var(--accent-soft);
-		color: var(--text);
-		font-weight: 600;
+		background: var(--color-accent-soft);
+		color: var(--color-text);
+		font-weight: var(--weight-semibold);
 	}
 
 	.icon {
 		display: inline-flex;
-		width: 16px;
-		height: 16px;
+		width: var(--icon-md);
+		height: var(--icon-md);
 		align-items: center;
 		justify-content: center;
-		color: var(--text-subtle);
+		color: var(--color-text-subtle);
 	}
 
 	.active .icon {
-		color: var(--text);
+		color: var(--color-text);
 	}
 
 	.label {
 		flex: 1;
-	}
-
-	.soon {
-		font-size: 10.5px;
-		font-weight: 500;
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
-		color: var(--text-subtle);
-		background: var(--bg);
-		padding: 2px 6px;
-		border-radius: var(--radius-sm);
 	}
 </style>

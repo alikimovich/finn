@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Sparkline from '$lib/components/Sparkline.svelte';
+	import EmptyState from '$lib/components/EmptyState.svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { formatRate, formatRateDate } from '$lib/utils/format';
 	import { getCurrency } from '$lib/data/currencies';
 	import type { RateSeries } from '$lib/types';
@@ -7,15 +9,10 @@
 	let { data }: { data: { series: RateSeries[] } } = $props();
 </script>
 
-<header class="header">
-	<div>
-		<h1>Rates</h1>
-		<p class="subtitle">30-day trend for the pairs you watch.</p>
-	</div>
-</header>
+<PageHeader title="Rates" subtitle="30-day trend for the pairs you watch." />
 
 {#if data.series.length === 0}
-	<div class="empty">Couldn't load rates right now. Try again in a moment.</div>
+	<EmptyState description="Couldn't load rates right now. Try again in a moment." />
 {:else}
 	<ul class="list">
 		{#each data.series as s (s.from + s.to)}
@@ -44,7 +41,7 @@
 					<div class="spark">
 						<Sparkline
 							points={s.points.map((p) => p.rate)}
-							stroke={up ? '#3a8a5c' : '#b8423b'}
+							tone={up ? 'up' : 'down'}
 						/>
 					</div>
 
@@ -74,30 +71,6 @@
 {/if}
 
 <style>
-	.header {
-		margin-bottom: var(--space-5);
-	}
-
-	h1 {
-		font-size: 24px;
-		letter-spacing: -0.02em;
-	}
-
-	.subtitle {
-		color: var(--text-muted);
-		font-size: 13.5px;
-		margin-top: var(--space-1);
-	}
-
-	.empty {
-		padding: var(--space-6);
-		text-align: center;
-		color: var(--text-subtle);
-		font-size: 13px;
-		border: 1px dashed var(--border);
-		border-radius: var(--radius-md);
-	}
-
 	.list {
 		list-style: none;
 		margin: 0;
@@ -113,18 +86,16 @@
 		align-items: center;
 		gap: var(--space-5);
 		padding: var(--space-4) var(--space-5);
-		background: var(--surface);
-		border: 1px solid var(--border);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
 		border-radius: var(--radius-md);
 		transition:
-			border-color 120ms ease,
-			background-color 120ms ease,
-			transform 120ms ease;
+			border-color var(--dur-2) var(--ease-standard),
+			background-color var(--dur-2) var(--ease-standard);
 	}
 
 	.row:hover {
-		border-color: var(--border-strong);
-		background: var(--surface);
+		border-color: var(--color-border-strong);
 	}
 
 	.pair {
@@ -136,15 +107,15 @@
 
 	.flags {
 		position: relative;
-		width: 36px;
+		width: var(--control-height-md);
 		height: 22px;
 		flex-shrink: 0;
 	}
 
 	.flag {
 		position: absolute;
-		font-size: 18px;
-		line-height: 1;
+		font-size: var(--text-2xl);
+		line-height: var(--leading-tight);
 		filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.1));
 	}
 
@@ -169,19 +140,19 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
-		font-weight: 600;
-		font-size: 14px;
-		letter-spacing: 0.02em;
+		font-weight: var(--weight-semibold);
+		font-size: var(--text-md);
+		letter-spacing: var(--tracking-wide);
 	}
 
 	.arrow {
-		color: var(--text-subtle);
-		font-weight: 400;
+		color: var(--color-text-subtle);
+		font-weight: var(--weight-regular);
 	}
 
 	.names {
-		font-size: 12px;
-		color: var(--text-muted);
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -198,9 +169,9 @@
 	}
 
 	.rate-value {
-		font-size: 16px;
-		font-weight: 600;
-		letter-spacing: -0.01em;
+		font-size: var(--text-xl);
+		font-weight: var(--weight-semibold);
+		letter-spacing: var(--tracking-tight);
 	}
 
 	.rate-meta {
@@ -209,41 +180,41 @@
 		justify-content: flex-end;
 		gap: var(--space-2);
 		margin-top: 2px;
-		font-size: 11.5px;
-		color: var(--text-muted);
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
 	}
 
 	.change {
-		font-weight: 600;
+		font-weight: var(--weight-semibold);
 		display: inline-flex;
 		align-items: center;
 		gap: 2px;
 	}
 
 	.change.up {
-		color: #3a8a5c;
+		color: var(--color-success);
 	}
 
 	.change.down {
-		color: var(--danger);
+		color: var(--color-danger);
 	}
 
 	.dot-sep {
-		color: var(--text-subtle);
+		color: var(--color-text-subtle);
 	}
 
 	.range {
-		color: var(--text-subtle);
+		color: var(--color-text-subtle);
 	}
 
 	.footnote {
 		margin-top: var(--space-5);
 		padding-top: var(--space-4);
-		border-top: 1px solid var(--border);
+		border-top: 1px solid var(--color-border);
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-2);
-		font-size: 11.5px;
-		color: var(--text-subtle);
+		font-size: var(--text-xs);
+		color: var(--color-text-subtle);
 	}
 </style>

@@ -28,13 +28,13 @@
 		justify-content: center;
 		gap: var(--space-2);
 		border-radius: var(--radius-md);
-		font-weight: 500;
-		line-height: 1;
+		font-weight: var(--weight-medium);
+		line-height: var(--leading-tight);
 		transition:
-			background-color 120ms ease,
-			border-color 120ms ease,
-			color 120ms ease,
-			transform 80ms ease;
+			background-color var(--dur-2) var(--ease-standard),
+			border-color var(--dur-2) var(--ease-standard),
+			color var(--dur-2) var(--ease-standard),
+			transform var(--dur-1) var(--ease-standard);
 		white-space: nowrap;
 	}
 
@@ -49,46 +49,46 @@
 	}
 
 	.size-sm {
-		font-size: 12.5px;
-		padding: 0 var(--space-3);
-		height: 28px;
+		font-size: var(--text-sm);
+		padding: 0 var(--control-pad-x-sm);
+		height: var(--control-height-sm);
 	}
 
 	.size-md {
-		font-size: 13.5px;
-		padding: 0 var(--space-4);
-		height: 36px;
+		font-size: var(--text-base);
+		padding: 0 var(--control-pad-x-md);
+		height: var(--control-height-md);
 	}
 
 	.variant-primary {
-		background: var(--accent);
-		color: var(--accent-text-on-dark);
-		border: 1px solid var(--accent);
+		background: var(--color-accent);
+		color: var(--color-text-on-accent);
+		border: 1px solid var(--color-accent);
 	}
 
 	.variant-primary:hover:not(:disabled) {
-		background: #2a2a23;
-		border-color: #2a2a23;
+		background: var(--color-accent-hover);
+		border-color: var(--color-accent-hover);
 	}
 
 	.variant-secondary {
-		background: var(--surface);
-		color: var(--text);
-		border: 1px solid var(--border-strong);
+		background: var(--color-surface);
+		color: var(--color-text);
+		border: 1px solid var(--color-border-strong);
 	}
 
 	.variant-secondary:hover:not(:disabled) {
-		background: var(--accent-soft);
+		background: var(--color-accent-soft);
 	}
 
 	.variant-ghost {
 		background: transparent;
-		color: var(--text-muted);
+		color: var(--color-text-muted);
 		border: 1px solid transparent;
 	}
 
 	.variant-ghost:hover:not(:disabled) {
-		background: var(--accent-soft);
-		color: var(--text);
+		background: var(--color-accent-soft);
+		color: var(--color-text);
 	}
 </style>

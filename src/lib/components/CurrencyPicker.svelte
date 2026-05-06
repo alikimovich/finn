@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { currencies, popularCodes } from '$lib/data/currencies';
 	import type { Currency, CurrencyCode } from '$lib/types';
+	import SearchField from './SearchField.svelte';
+	import SectionLabel from './SectionLabel.svelte';
+	import Icon from './Icon.svelte';
 
 	interface Props {
 		selected: CurrencyCode;
@@ -13,7 +16,6 @@
 	let open = $state(false);
 	let query = $state('');
 	let triggerEl: HTMLButtonElement | undefined = $state();
-	let searchEl: HTMLInputElement | undefined = $state();
 
 	const selectedCurrency = $derived(
 		currencies.find((c) => c.code === selected) ?? currencies[0]
@@ -39,9 +41,6 @@
 
 	function toggle() {
 		open = !open;
-		if (open) {
-			queueMicrotask(() => searchEl?.focus());
-		}
 	}
 
 	function close() {
@@ -91,51 +90,20 @@
 	>
 		<span class="flag" aria-hidden="true">{selectedCurrency.flag}</span>
 		<span class="code">{selectedCurrency.code}</span>
-		<svg
-			class="chev"
-			width="10"
-			height="10"
-			viewBox="0 0 10 10"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="1.5"
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			aria-hidden="true"
-		>
-			<path d="m3 4 2 2 2-2" />
-		</svg>
+		<span class="chev">
+			<Icon name="chevron-down" size="xs" />
+		</span>
 	</button>
 
 	{#if open}
 		<div class="popover" data-currency-popover role="dialog" aria-label="Select currency">
-			<div class="search">
-				<svg
-					width="14"
-					height="14"
-					viewBox="0 0 16 16"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="1.5"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					aria-hidden="true"
-				>
-					<circle cx="7" cy="7" r="5" />
-					<path d="m11 11 3 3" />
-				</svg>
-				<input
-					bind:this={searchEl}
-					bind:value={query}
-					type="text"
-					placeholder="Search currency"
-					autocomplete="off"
-				/>
-			</div>
+			<SearchField bind:value={query} placeholder="Search currency" variant="plain" />
 
 			<div class="list" role="listbox">
 				{#if !query.trim() && popular.length > 0}
-					<div class="group-label">Popular</div>
+					<div class="group-label">
+						<SectionLabel text="Popular" />
+					</div>
 					{#each popular as currency (currency.code)}
 						<button
 							class="row"
@@ -150,7 +118,9 @@
 							<span class="row-name">{currency.name}</span>
 						</button>
 					{/each}
-					<div class="group-label">All currencies</div>
+					<div class="group-label">
+						<SectionLabel text="All currencies" />
+					</div>
 				{/if}
 				{#each filtered as currency (currency.code)}
 					<button
@@ -183,73 +153,54 @@
 		display: inline-flex;
 		align-items: center;
 		gap: var(--space-2);
-		height: 40px;
+		height: var(--control-height-lg);
 		padding: 0 var(--space-3);
-		background: var(--surface);
-		border: 1px solid var(--border-strong);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border-strong);
 		border-radius: var(--radius-pill);
-		font-weight: 600;
-		font-size: 14px;
-		transition: border-color 120ms ease, background-color 120ms ease;
+		font-weight: var(--weight-semibold);
+		font-size: var(--text-md);
+		transition:
+			border-color var(--dur-2) var(--ease-standard),
+			background-color var(--dur-2) var(--ease-standard);
 	}
 
 	.trigger:hover {
-		background: var(--accent-soft);
+		background: var(--color-accent-soft);
 	}
 
 	.trigger[aria-expanded='true'] {
-		border-color: var(--accent);
+		border-color: var(--color-accent);
 	}
 
 	.flag {
-		font-size: 16px;
-		line-height: 1;
+		font-size: var(--text-xl);
+		line-height: var(--leading-tight);
 	}
 
 	.code {
-		letter-spacing: 0.02em;
+		letter-spacing: var(--tracking-wide);
 	}
 
 	.chev {
-		color: var(--text-subtle);
+		display: inline-flex;
+		color: var(--color-text-subtle);
 	}
 
 	.popover {
 		position: absolute;
-		top: calc(100% + 6px);
+		top: calc(100% + var(--space-1) + 2px);
 		left: 0;
-		width: 320px;
-		max-height: 380px;
-		background: var(--surface);
-		border: 1px solid var(--border);
+		width: var(--popover-width);
+		max-height: var(--popover-max-height);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-md);
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		z-index: 20;
-	}
-
-	.search {
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
-		padding: var(--space-3) var(--space-4);
-		border-bottom: 1px solid var(--border);
-		color: var(--text-subtle);
-	}
-
-	.search input {
-		flex: 1;
-		border: none;
-		outline: none;
-		background: transparent;
-		font-size: 13.5px;
-		color: var(--text);
-	}
-
-	.search input::placeholder {
-		color: var(--text-subtle);
+		z-index: var(--z-popover);
 	}
 
 	.list {
@@ -259,11 +210,6 @@
 	}
 
 	.group-label {
-		font-size: 10.5px;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--text-subtle);
 		padding: var(--space-3) var(--space-4) var(--space-1);
 	}
 
@@ -274,25 +220,25 @@
 		width: 100%;
 		padding: var(--space-2) var(--space-4);
 		text-align: left;
-		font-size: 13.5px;
+		font-size: var(--text-base);
 	}
 
 	.row:hover {
-		background: var(--accent-soft);
+		background: var(--color-accent-soft);
 	}
 
 	.row.selected {
-		background: var(--accent-soft);
+		background: var(--color-accent-soft);
 	}
 
 	.row-code {
-		font-weight: 600;
-		min-width: 36px;
+		font-weight: var(--weight-semibold);
+		min-width: var(--control-height-md);
 	}
 
 	.row-name {
-		color: var(--text-muted);
-		font-size: 12.5px;
+		color: var(--color-text-muted);
+		font-size: var(--text-sm);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -301,7 +247,7 @@
 	.empty {
 		padding: var(--space-4);
 		text-align: center;
-		color: var(--text-subtle);
-		font-size: 12.5px;
+		color: var(--color-text-subtle);
+		font-size: var(--text-sm);
 	}
 </style>

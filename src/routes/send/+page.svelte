@@ -1,15 +1,17 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
+	import Badge from '$lib/components/Badge.svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 </script>
 
-<header class="header">
-	<h1>Send</h1>
-	<p>Move money to a contact or bank account in any supported currency.</p>
-</header>
+<PageHeader
+	title="Send"
+	subtitle="Move money to a contact or bank account in any supported currency."
+/>
 
 <Card>
 	<div class="placeholder">
-		<div class="badge">Coming soon</div>
+		<Badge variant="soft">Coming soon</Badge>
 		<p>
 			Linked banks, contacts, and one-tap transfers in the same FX engine that
 			powers Convert.
@@ -18,18 +20,6 @@
 </Card>
 
 <style>
-	.header {
-		margin-bottom: var(--space-5);
-	}
-	h1 {
-		font-size: 24px;
-		letter-spacing: -0.02em;
-	}
-	p {
-		color: var(--text-muted);
-		font-size: 13.5px;
-		margin-top: var(--space-1);
-	}
 	.placeholder {
 		display: flex;
 		flex-direction: column;
@@ -37,16 +27,7 @@
 		gap: var(--space-3);
 		padding: var(--space-3) 0;
 	}
-	.badge {
-		font-size: 10.5px;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--text-muted);
-		background: var(--accent-soft);
-		padding: 4px 8px;
-		border-radius: var(--radius-sm);
-	}
+
 	.placeholder p {
 		max-width: 60ch;
 		margin: 0;

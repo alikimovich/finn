@@ -2,6 +2,10 @@
 	import Card from '$lib/components/Card.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import CurrencyPicker from '$lib/components/CurrencyPicker.svelte';
+	import EmptyState from '$lib/components/EmptyState.svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
+	import SectionLabel from '$lib/components/SectionLabel.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { pairRate } from '$lib/utils/convert';
 	import {
 		formatAmount,
@@ -10,7 +14,6 @@
 		formatRelativeTime
 	} from '$lib/utils/format';
 	import { recentConversions } from '$lib/stores/recentConversions';
-	import { getCurrency } from '$lib/data/currencies';
 	import type { Conversion, CurrencyCode } from '$lib/types';
 
 	import { page } from '$app/state';
@@ -99,22 +102,17 @@
 		fromAmount = String(c.amount);
 		lastEdited = 'from';
 	}
-
-	const fromCurrency = $derived(getCurrency(from));
-	const toCurrency = $derived(getCurrency(to));
 </script>
 
-<header class="header">
-	<div>
-		<h1>Convert</h1>
-		<p class="subtitle">Live FX rates from the European Central Bank.</p>
-	</div>
-</header>
+<PageHeader
+	title="Convert"
+	subtitle="Live FX rates from the European Central Bank."
+/>
 
 <Card padding="lg">
 	<div class="converter">
 		<div class="row">
-			<div class="row-label">You send</div>
+			<SectionLabel text="You send" />
 			<div class="row-content">
 				<CurrencyPicker selected={from} exclude={to} onSelect={selectFrom} />
 				<input
@@ -132,27 +130,16 @@
 			<button
 				class="swap"
 				type="button"
-				style="--swap-rot: {swapRotation}deg"
+				style:--swap-rot="{swapRotation}deg"
 				onclick={swap}
 				aria-label="Swap currencies"
 			>
-				<svg
-					width="14"
-					height="14"
-					viewBox="0 0 16 16"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="1.5"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M5 3v9M2 6l3-3 3 3M11 13V4M14 10l-3 3-3-3" />
-				</svg>
+				<Icon name="swap-vertical" size="sm" />
 			</button>
 		</div>
 
 		<div class="row">
-			<div class="row-label">They get</div>
+			<SectionLabel text="They get" />
 			<div class="row-content">
 				<CurrencyPicker selected={to} exclude={from} onSelect={selectTo} />
 				<input
@@ -188,7 +175,7 @@
 
 <section class="recent">
 	<div class="recent-head">
-		<h2>Recent</h2>
+		<SectionLabel as="h2" text="Recent" />
 		{#if $recentConversions.length > 0}
 			<button class="clear" type="button" onclick={() => recentConversions.clear()}>
 				Clear
@@ -197,9 +184,10 @@
 	</div>
 
 	{#if $recentConversions.length === 0}
-		<div class="empty">
-			Nothing yet. Save a conversion to keep it here.
-		</div>
+		<EmptyState
+			tone="subtle"
+			description="Nothing yet. Save a conversion to keep it here."
+		/>
 	{:else}
 		<ul class="list">
 			{#each $recentConversions as item (item.id)}
@@ -227,21 +215,6 @@
 </section>
 
 <style>
-	.header {
-		margin-bottom: var(--space-5);
-	}
-
-	h1 {
-		font-size: 24px;
-		letter-spacing: -0.02em;
-	}
-
-	.subtitle {
-		color: var(--text-muted);
-		font-size: 13.5px;
-		margin-top: var(--space-1);
-	}
-
 	.converter {
 		display: flex;
 		flex-direction: column;
@@ -252,14 +225,6 @@
 		flex-direction: column;
 		gap: var(--space-1);
 		padding: var(--space-3) 0;
-	}
-
-	.row-label {
-		font-size: 11.5px;
-		font-weight: 500;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--text-subtle);
 	}
 
 	.row-content {
@@ -274,11 +239,11 @@
 		background: transparent;
 		border: none;
 		outline: none;
-		font-size: 36px;
-		font-weight: 600;
-		letter-spacing: -0.02em;
-		line-height: 1.2;
-		color: var(--text);
+		font-size: var(--text-display);
+		font-weight: var(--weight-semibold);
+		letter-spacing: var(--tracking-display);
+		line-height: var(--leading-snug);
+		color: var(--color-text);
 		font-family: inherit;
 		font-variant-numeric: tabular-nums;
 		padding: var(--space-1) 0;
@@ -286,13 +251,13 @@
 	}
 
 	.amount-input::placeholder {
-		color: var(--text-subtle);
+		color: var(--color-text-subtle);
 	}
 
 	.divider {
 		position: relative;
 		height: 1px;
-		background: var(--border);
+		background: var(--color-border);
 		margin: var(--space-1) 0;
 	}
 
@@ -300,25 +265,25 @@
 		position: absolute;
 		left: 50%;
 		top: 50%;
-		width: 32px;
-		height: 32px;
-		border-radius: 50%;
-		background: var(--surface);
-		border: 1px solid var(--border-strong);
-		color: var(--text-muted);
+		width: var(--space-6);
+		height: var(--space-6);
+		border-radius: var(--radius-circle);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border-strong);
+		color: var(--color-text-muted);
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		transform: translate(-50%, -50%) rotate(var(--swap-rot, 0deg));
 		transition:
-			background-color 120ms ease,
-			color 120ms ease,
-			transform 360ms cubic-bezier(0.5, 1.4, 0.4, 1);
+			background-color var(--dur-2) var(--ease-standard),
+			color var(--dur-2) var(--ease-standard),
+			transform var(--dur-5) var(--ease-spring);
 	}
 
 	.swap:hover {
-		background: var(--accent-soft);
-		color: var(--text);
+		background: var(--color-accent-soft);
+		color: var(--color-text);
 	}
 
 	.rate-meta {
@@ -328,23 +293,23 @@
 		gap: var(--space-2);
 		padding-top: var(--space-4);
 		margin-top: var(--space-4);
-		border-top: 1px solid var(--border);
-		color: var(--text-muted);
-		font-size: 12.5px;
+		border-top: 1px solid var(--color-border);
+		color: var(--color-text-muted);
+		font-size: var(--text-sm);
 		font-variant-numeric: tabular-nums;
 	}
 
 	.rate {
-		font-weight: 500;
-		color: var(--text);
+		font-weight: var(--weight-medium);
+		color: var(--color-text);
 	}
 
 	.dot-sep {
-		color: var(--text-subtle);
+		color: var(--color-text-subtle);
 	}
 
 	.source {
-		color: var(--text-subtle);
+		color: var(--color-text-subtle);
 	}
 
 	.actions {
@@ -364,31 +329,14 @@
 		margin-bottom: var(--space-3);
 	}
 
-	h2 {
-		font-size: 13px;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--text-muted);
-	}
-
 	.clear {
-		font-size: 12px;
-		color: var(--text-subtle);
-		transition: color 120ms ease;
+		font-size: var(--text-sm);
+		color: var(--color-text-subtle);
+		transition: color var(--dur-2) var(--ease-standard);
 	}
 
 	.clear:hover {
-		color: var(--text);
-	}
-
-	.empty {
-		padding: var(--space-5);
-		text-align: center;
-		color: var(--text-subtle);
-		font-size: 13px;
-		border: 1px dashed var(--border);
-		border-radius: var(--radius-md);
+		color: var(--color-text);
 	}
 
 	.list {
@@ -408,14 +356,16 @@
 		width: 100%;
 		padding: var(--space-3) var(--space-4);
 		border-radius: var(--radius-md);
-		background: var(--surface);
-		border: 1px solid var(--border);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
 		text-align: left;
-		transition: border-color 120ms ease, background-color 120ms ease;
+		transition:
+			border-color var(--dur-2) var(--ease-standard),
+			background-color var(--dur-2) var(--ease-standard);
 	}
 
 	.recent-row:hover {
-		border-color: var(--border-strong);
+		border-color: var(--color-border-strong);
 	}
 
 	.recent-amounts {
@@ -423,28 +373,24 @@
 		align-items: center;
 		gap: var(--space-2);
 		font-variant-numeric: tabular-nums;
-		font-size: 13.5px;
+		font-size: var(--text-base);
 	}
 
-	.from-amt {
-		color: var(--text);
-		font-weight: 500;
+	.from-amt,
+	.to-amt {
+		color: var(--color-text);
+		font-weight: var(--weight-medium);
 	}
 
 	.arrow {
-		color: var(--text-subtle);
-	}
-
-	.to-amt {
-		color: var(--text);
-		font-weight: 500;
+		color: var(--color-text-subtle);
 	}
 
 	.recent-meta {
 		display: inline-flex;
 		gap: var(--space-2);
-		color: var(--text-subtle);
-		font-size: 12.5px;
+		color: var(--color-text-subtle);
+		font-size: var(--text-sm);
 		font-variant-numeric: tabular-nums;
 	}
 </style>

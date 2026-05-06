@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import IconButton from './IconButton.svelte';
+	import Icon from './Icon.svelte';
 
 	interface Props {
 		open: boolean;
@@ -39,24 +41,9 @@
 			{#if title}
 				<header class="head">
 					<h2>{title}</h2>
-					<button
-						class="close"
-						type="button"
-						onclick={onClose}
-						aria-label="Close dialog"
-					>
-						<svg
-							width="14"
-							height="14"
-							viewBox="0 0 16 16"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="1.5"
-							stroke-linecap="round"
-						>
-							<path d="m4 4 8 8M12 4l-8 8" />
-						</svg>
-					</button>
+					<IconButton aria-label="Close dialog" onclick={onClose}>
+						<Icon name="close" size="sm" />
+					</IconButton>
 				</header>
 			{/if}
 			<div class="body">
@@ -75,13 +62,13 @@
 	.backdrop {
 		position: fixed;
 		inset: 0;
-		background: rgba(20, 20, 15, 0.32);
+		background: var(--color-overlay);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		padding: var(--space-5);
-		z-index: 50;
-		animation: fade 140ms ease;
+		z-index: var(--z-dialog);
+		animation: fade var(--dur-3) var(--ease-standard);
 	}
 
 	@keyframes fade {
@@ -95,15 +82,15 @@
 
 	.panel {
 		width: 100%;
-		max-width: 440px;
-		background: var(--surface);
-		border: 1px solid var(--border);
+		max-width: var(--dialog-max-width);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
-		box-shadow: 0 24px 60px rgba(20, 20, 15, 0.16);
+		box-shadow: var(--shadow-lg);
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		animation: rise 160ms cubic-bezier(0.4, 0.8, 0.2, 1);
+		animation: rise var(--dur-4) var(--ease-emphatic);
 	}
 
 	@keyframes rise {
@@ -122,29 +109,13 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: var(--space-4) var(--space-5);
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid var(--color-border);
 	}
 
 	.head h2 {
-		font-size: 15px;
-		font-weight: 600;
-		letter-spacing: -0.01em;
-	}
-
-	.close {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 28px;
-		height: 28px;
-		border-radius: var(--radius-sm);
-		color: var(--text-muted);
-		transition: background-color 120ms ease, color 120ms ease;
-	}
-
-	.close:hover {
-		background: var(--accent-soft);
-		color: var(--text);
+		font-size: var(--text-lg);
+		font-weight: var(--weight-semibold);
+		letter-spacing: var(--tracking-tight);
 	}
 
 	.body {
@@ -156,7 +127,7 @@
 		gap: var(--space-2);
 		justify-content: flex-end;
 		padding: var(--space-4) var(--space-5);
-		border-top: 1px solid var(--border);
-		background: var(--bg);
+		border-top: 1px solid var(--color-border);
+		background: var(--color-bg);
 	}
 </style>

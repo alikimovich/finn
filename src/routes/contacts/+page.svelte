@@ -3,6 +3,12 @@
 	import Button from '$lib/components/Button.svelte';
 	import CurrencyPicker from '$lib/components/CurrencyPicker.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
+	import EmptyState from '$lib/components/EmptyState.svelte';
+	import Field from '$lib/components/Field.svelte';
+	import Icon from '$lib/components/Icon.svelte';
+	import IconButton from '$lib/components/IconButton.svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
+	import SearchField from '$lib/components/SearchField.svelte';
 	import { contacts } from '$lib/stores/contacts';
 	import { getCurrency } from '$lib/data/currencies';
 	import { formatRelativeTime } from '$lib/utils/format';
@@ -71,69 +77,37 @@
 	}
 </script>
 
-<header class="header">
-	<div>
-		<h1>Contacts</h1>
-		<p class="subtitle">People you send to and receive from.</p>
-	</div>
-	<Button variant="primary" size="md" onclick={openAdd}>
-		<svg
-			width="14"
-			height="14"
-			viewBox="0 0 16 16"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="1.6"
-			stroke-linecap="round"
-			aria-hidden="true"
-		>
-			<path d="M8 3v10M3 8h10" />
-		</svg>
-		Add contact
-	</Button>
-</header>
+<PageHeader title="Contacts" subtitle="People you send to and receive from.">
+	{#snippet actions()}
+		<Button variant="primary" size="md" onclick={openAdd}>
+			<Icon name="plus" size="sm" strokeWidth={1.6} />
+			Add contact
+		</Button>
+	{/snippet}
+</PageHeader>
 
 {#if $contacts.length > 0}
-	<div class="search">
-		<svg
-			width="14"
-			height="14"
-			viewBox="0 0 16 16"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="1.5"
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			aria-hidden="true"
-		>
-			<circle cx="7" cy="7" r="5" />
-			<path d="m11 11 3 3" />
-		</svg>
-		<input
-			bind:value={query}
-			type="text"
-			placeholder="Search contacts"
-			autocomplete="off"
-		/>
+	<div class="search-wrap">
+		<SearchField bind:value={query} placeholder="Search contacts" />
 	</div>
 {/if}
 
 {#if $contacts.length === 0}
-	<div class="empty">
-		<div class="empty-icon" aria-hidden="true">
-			<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-				<circle cx="12" cy="9" r="4" />
-				<path d="M3 21c0-4.5 4-7 9-7s9 2.5 9 7" />
-			</svg>
-		</div>
-		<p class="empty-title">No contacts yet</p>
-		<p class="empty-sub">Add the people you most often send money to.</p>
-		<Button variant="secondary" size="sm" onclick={openAdd}>Add your first contact</Button>
-	</div>
+	<EmptyState
+		title="No contacts yet"
+		description="Add the people you most often send money to."
+	>
+		{#snippet icon()}
+			<Icon name="user" size="lg" strokeWidth={1.4} />
+		{/snippet}
+		{#snippet action()}
+			<Button variant="secondary" size="sm" onclick={openAdd}>
+				Add your first contact
+			</Button>
+		{/snippet}
+	</EmptyState>
 {:else if filtered.length === 0}
-	<div class="empty subtle">
-		<p>No contacts match "{query}".</p>
-	</div>
+	<EmptyState tone="subtle" description={`No contacts match "${query}".`} />
 {:else}
 	<ul class="list">
 		{#each filtered as c (c.id)}
@@ -156,26 +130,12 @@
 					</div>
 				</div>
 				<div class="actions">
-					<button
-						class="icon-btn"
-						type="button"
-						onclick={() => openEdit(c)}
-						aria-label="Edit {c.name}"
-					>
-						<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-							<path d="M11 2.5 13.5 5 5.5 13H3v-2.5L11 2.5Z" />
-						</svg>
-					</button>
-					<button
-						class="icon-btn danger"
-						type="button"
-						onclick={() => remove(c.id)}
-						aria-label="Delete {c.name}"
-					>
-						<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-							<path d="M3 4h10M5 4V2.5h6V4M6 7v5M10 7v5M4.5 4l.5 9a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1l.5-9" />
-						</svg>
-					</button>
+					<IconButton aria-label="Edit {c.name}" onclick={() => openEdit(c)}>
+						<Icon name="edit" size="sm" />
+					</IconButton>
+					<IconButton variant="danger" aria-label="Delete {c.name}" onclick={() => remove(c.id)}>
+						<Icon name="trash" size="sm" />
+					</IconButton>
 				</div>
 			</li>
 		{/each}
@@ -188,8 +148,7 @@
 	onClose={close}
 >
 	<form class="form" onsubmit={(e) => { e.preventDefault(); save(); }}>
-		<label class="field">
-			<span class="label">Name</span>
+		<Field label="Name">
 			<input
 				bind:value={formName}
 				type="text"
@@ -197,34 +156,31 @@
 				autocomplete="off"
 				required
 			/>
-		</label>
+		</Field>
 
-		<label class="field">
-			<span class="label">Email <span class="optional">(optional)</span></span>
+		<Field label="Email" optional>
 			<input
 				bind:value={formEmail}
 				type="email"
 				placeholder="jane@example.com"
 				autocomplete="off"
 			/>
-		</label>
+		</Field>
 
-		<div class="field">
-			<span class="label">Preferred currency</span>
+		<Field label="Preferred currency" as="div">
 			<CurrencyPicker
 				selected={formCurrency}
 				onSelect={(code) => (formCurrency = code)}
 			/>
-		</div>
+		</Field>
 
-		<label class="field">
-			<span class="label">Notes <span class="optional">(optional)</span></span>
+		<Field label="Notes" optional>
 			<textarea
 				bind:value={formNotes}
 				placeholder="Anything to remember about this contact"
 				rows="3"
 			></textarea>
-		</label>
+		</Field>
 	</form>
 
 	{#snippet footer()}
@@ -236,84 +192,7 @@
 </Dialog>
 
 <style>
-	.header {
-		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
-		gap: var(--space-4);
-		margin-bottom: var(--space-5);
-	}
-
-	h1 {
-		font-size: 24px;
-		letter-spacing: -0.02em;
-	}
-
-	.subtitle {
-		color: var(--text-muted);
-		font-size: 13.5px;
-		margin-top: var(--space-1);
-	}
-
-	.search {
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
-		background: var(--surface);
-		border: 1px solid var(--border);
-		border-radius: var(--radius-md);
-		padding: 0 var(--space-4);
-		height: 40px;
-		color: var(--text-subtle);
-		margin-bottom: var(--space-3);
-	}
-
-	.search:focus-within {
-		border-color: var(--border-strong);
-	}
-
-	.search input {
-		flex: 1;
-		border: none;
-		outline: none;
-		background: transparent;
-		font-size: 13.5px;
-		color: var(--text);
-	}
-
-	.search input::placeholder {
-		color: var(--text-subtle);
-	}
-
-	.empty {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--space-2);
-		text-align: center;
-		padding: var(--space-7) var(--space-5);
-		border: 1px dashed var(--border);
-		border-radius: var(--radius-md);
-	}
-
-	.empty.subtle {
-		padding: var(--space-5);
-		color: var(--text-subtle);
-	}
-
-	.empty-icon {
-		color: var(--text-subtle);
-		margin-bottom: var(--space-2);
-	}
-
-	.empty-title {
-		font-size: 14px;
-		font-weight: 600;
-	}
-
-	.empty-sub {
-		color: var(--text-muted);
-		font-size: 13px;
+	.search-wrap {
 		margin-bottom: var(--space-3);
 	}
 
@@ -331,14 +210,14 @@
 		align-items: center;
 		gap: var(--space-3);
 		padding: var(--space-3) var(--space-4);
-		background: var(--surface);
-		border: 1px solid var(--border);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
 		border-radius: var(--radius-md);
-		transition: border-color 120ms ease;
+		transition: border-color var(--dur-2) var(--ease-standard);
 	}
 
 	.row:hover {
-		border-color: var(--border-strong);
+		border-color: var(--color-border-strong);
 	}
 
 	.row:hover .actions {
@@ -351,8 +230,8 @@
 	}
 
 	.name {
-		font-weight: 600;
-		font-size: 14px;
+		font-weight: var(--weight-semibold);
+		font-size: var(--text-md);
 	}
 
 	.sub {
@@ -360,8 +239,8 @@
 		flex-wrap: wrap;
 		gap: var(--space-2);
 		margin-top: 2px;
-		font-size: 12.5px;
-		color: var(--text-muted);
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
 	}
 
 	.currency {
@@ -371,91 +250,23 @@
 	}
 
 	.dot-sep {
-		color: var(--text-subtle);
+		color: var(--color-text-subtle);
 	}
 
 	.added {
-		color: var(--text-subtle);
+		color: var(--color-text-subtle);
 	}
 
 	.actions {
 		display: flex;
 		gap: 2px;
 		opacity: 0.4;
-		transition: opacity 120ms ease;
-	}
-
-	.icon-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 28px;
-		height: 28px;
-		border-radius: var(--radius-sm);
-		color: var(--text-muted);
-		transition: background-color 120ms ease, color 120ms ease;
-	}
-
-	.icon-btn:hover {
-		background: var(--accent-soft);
-		color: var(--text);
-	}
-
-	.icon-btn.danger:hover {
-		background: rgba(184, 66, 59, 0.1);
-		color: var(--danger);
+		transition: opacity var(--dur-2) var(--ease-standard);
 	}
 
 	.form {
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-4);
-	}
-
-	.field {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2);
-	}
-
-	.label {
-		font-size: 12px;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: var(--text-muted);
-	}
-
-	.optional {
-		text-transform: none;
-		letter-spacing: normal;
-		font-weight: 400;
-		color: var(--text-subtle);
-	}
-
-	.form input[type='text'],
-	.form input[type='email'],
-	.form textarea {
-		width: 100%;
-		font-family: inherit;
-		font-size: 13.5px;
-		color: var(--text);
-		background: var(--surface);
-		border: 1px solid var(--border);
-		border-radius: var(--radius-md);
-		padding: var(--space-2) var(--space-3);
-		outline: none;
-		transition: border-color 120ms ease;
-	}
-
-	.form input:focus,
-	.form textarea:focus {
-		border-color: var(--accent);
-	}
-
-	.form textarea {
-		resize: vertical;
-		line-height: 1.5;
-		min-height: 72px;
 	}
 </style>

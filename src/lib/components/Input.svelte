@@ -30,29 +30,31 @@
 		border: 1px solid transparent;
 		border-radius: var(--radius-md);
 		outline: none;
-		transition: border-color 120ms ease, background-color 120ms ease;
+		transition:
+			border-color var(--dur-2) var(--ease-standard),
+			background-color var(--dur-2) var(--ease-standard);
 	}
 
 	.input:focus {
-		border-color: var(--border-strong);
-		background: var(--surface);
+		border-color: var(--color-border-strong);
+		background: var(--color-surface);
 	}
 
 	.input::placeholder {
-		color: var(--text-subtle);
+		color: var(--color-text-subtle);
 	}
 
 	.size-md {
-		height: 36px;
+		height: var(--control-height-md);
 		padding: 0 var(--space-3);
-		font-size: 13.5px;
+		font-size: var(--text-base);
 	}
 
 	.size-xl {
-		font-size: 36px;
-		font-weight: 600;
-		letter-spacing: -0.02em;
-		line-height: 1.2;
+		font-size: var(--text-display);
+		font-weight: var(--weight-semibold);
+		letter-spacing: var(--tracking-display);
+		line-height: var(--leading-snug);
 		padding: var(--space-2) 0;
 		font-variant-numeric: tabular-nums;
 	}

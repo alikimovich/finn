@@ -22,26 +22,11 @@
 		return Math.abs(h);
 	}
 
-	// Muted earth tones tuned for the Mercury palette
-	const palette = [
-		{ bg: '#e8e3d4', fg: '#5e5439' },
-		{ bg: '#dfe5d6', fg: '#465339' },
-		{ bg: '#e3dfe6', fg: '#4f445a' },
-		{ bg: '#e7dad3', fg: '#624b3e' },
-		{ bg: '#d8e1e3', fg: '#3e5258' },
-		{ bg: '#e6dde3', fg: '#5b3f50' },
-		{ bg: '#dde4d8', fg: '#3f5740' }
-	];
-
-	const tone = $derived(palette[hash(name) % palette.length]);
+	const tone = $derived((hash(name) % 7) + 1);
 	const text = $derived(initials(name));
 </script>
 
-<span
-	class="avatar"
-	style="--bg: {tone.bg}; --fg: {tone.fg}; --size: {size}px;"
-	aria-hidden="true"
->
+<span class="avatar tone-{tone}" style:--size="{size}px" aria-hidden="true">
 	{text}
 </span>
 
@@ -52,12 +37,18 @@
 		justify-content: center;
 		width: var(--size);
 		height: var(--size);
-		border-radius: 50%;
-		background: var(--bg);
-		color: var(--fg);
+		border-radius: var(--radius-circle);
 		font-size: calc(var(--size) * 0.36);
-		font-weight: 600;
-		letter-spacing: 0.02em;
+		font-weight: var(--weight-semibold);
+		letter-spacing: var(--tracking-wide);
 		flex-shrink: 0;
 	}
+
+	.tone-1 { background: var(--avatar-1-bg); color: var(--avatar-1-fg); }
+	.tone-2 { background: var(--avatar-2-bg); color: var(--avatar-2-fg); }
+	.tone-3 { background: var(--avatar-3-bg); color: var(--avatar-3-fg); }
+	.tone-4 { background: var(--avatar-4-bg); color: var(--avatar-4-fg); }
+	.tone-5 { background: var(--avatar-5-bg); color: var(--avatar-5-fg); }
+	.tone-6 { background: var(--avatar-6-bg); color: var(--avatar-6-fg); }
+	.tone-7 { background: var(--avatar-7-bg); color: var(--avatar-7-fg); }
 </style>

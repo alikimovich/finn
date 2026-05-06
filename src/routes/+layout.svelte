@@ -36,7 +36,7 @@
 
 	.content {
 		width: 100%;
-		max-width: 880px;
+		max-width: var(--layout-content-max);
 		padding: var(--space-7) var(--space-6) var(--space-8);
 	}
 </style>
