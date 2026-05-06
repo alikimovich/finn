@@ -1,6 +1,6 @@
 ---
 name: design-system
-description: Use this skill BEFORE writing or editing any UI in finn — building a screen, page, route, form, dialog, list, button, or component. It gives you the component inventory pointer, composition recipes, and the anti-patterns to avoid. Triggers on phrases like "build a screen", "add a page", "make a form", "create a route", "design", "component", "send screen", "convert", "contacts", or any task involving `.svelte` files under `src/routes/` or `src/lib/components/`.
+description: Use this skill BEFORE writing or editing any UI in finn — building a screen, page, route, form, dialog, list, button, or component. It gives you the component inventory pointer, composition recipes, anti-patterns to avoid, and the rules for translating a Figma design into the right primitives. Triggers on phrases like "build a screen", "add a page", "make a form", "create a route", "design", "component", "send screen", "convert", "contacts", "figma", any figma.com URL, or any task involving `.svelte` files under `src/routes/` or `src/lib/components/`.
 ---
 
 # finn — design system skill
@@ -58,6 +58,102 @@ raw controls, inline styles, hex/px/rgba/ms literals in route CSS, and
 bare `<input>`/`<textarea>` outside `<Field>` — don't disable rules; fix
 the code. The `Stop` hook re-runs ESLint on the files you edited and
 surfaces any violations as additional context.
+
+---
+
+## When implementing from Figma
+
+If the source is a Figma file (or any pixel-perfect spec), read it
+**carefully** before picking primitives. Use the Figma MCP
+(`get_design_context`) to fetch the design context — the response
+includes the typography styles, which is your map to the right
+primitive. Common failure modes from past builds:
+
+1. **Match the label size to the right primitive.** Two uppercase-label
+   styles look similar but mean different things:
+   - **10.5px / `--text-2xs` / 0.06em tracking** → `<SectionLabel>` +
+     standalone control below. Used for prominent section headings
+     inside a card.
+   - **12.5px / `--text-sm` / 0.04em tracking** → `<Field>` wrapping the
+     control. Used for inline form-row labels.
+   Defaulting to `<Field>` for every form row is the most common
+   mistake. Figma's "Page title", "Section label", "Field label" styles
+   each map to a specific primitive — read the type style name first.
+
+2. **Respect placement — read the Figma layout before composing.**
+   - Two elements drawn on the same row in Figma → one `<Cluster>`.
+     If they sit at the row's edges (e.g. currency picker on the left,
+     amount on the right), use `<Cluster justify="between">`.
+   - Stacking them vertically as separate `<Stack>` rows is a different
+     design.
+   - Trailing actions (Send button on the right of a card) → wrap in a
+     `<Cluster justify="end">` or use the parent's `align="end"`.
+
+3. **Don't relabel or rephrase copy.** If Figma says "BALANCE", use
+   "BALANCE" — even if it reads semantically wrong for the field.
+   Surface the question to the user instead of silently substituting
+   "TO" / "RECIPIENT" / your own guess. Same goes for subtitles,
+   button labels, helper text.
+
+4. **Render the visual state Figma shows.** A button drawn as a filled
+   primary in Figma should be `<Button variant="primary">` even if your
+   first instinct is "this should be disabled until a recipient is
+   entered." Wire interactivity (`disabled`, validation) separately;
+   don't downgrade the rendered variant to match a hypothesis about
+   logic.
+
+5. **Map every literal you read to a token.** Figma exposes raw values
+   (24px, -0.24px, #14140f); your job is to translate them to tokens
+   from `src/lib/tokens.md` before writing CSS:
+   - 24px → `--text-3xl`; 36px → `--text-display`; 13.5px → `--text-base`.
+   - `-0.02em` tracking → `--tracking-display`; `0.06em` →
+     `--tracking-caps`; `0.04em` → `--tracking-caps-sm`.
+   - Spacing values 4/8/12/16/24/32/48/64 → `--space-1..8`.
+   ESLint will block hex/px/ms literals in route CSS — but inline
+   styles on primitives (`<Stack space="3">`) should already be the
+   token-shaped value, not a Figma px reading.
+
+6. **Reuse a built reference.** `src/routes/contacts/+page.svelte` and
+   `src/routes/convert/+page.svelte` are the established composition
+   patterns for finn — open one before building a similar screen
+   instead of re-deriving from the Figma alone.
+
+7. **Recognize existing primitives — don't reimplement them.** Before
+   writing any markup, scan the Figma frame for shapes you've already
+   seen in the CLAUDE.md inventory: a sidebar with brand+nav+footer is
+   `<Sidebar>`, a dashed empty box is `<EmptyState>`, an
+   inline-bulleted meta line is `<Cluster>` + `<DotSep>`, an initials
+   circle is `<Avatar>`, an uppercase status pill is `<Badge>`. Under
+   "match Figma exactly" pressure, agents often build a parallel div
+   tree instead of using the primitive that already produces the
+   pixels — use the primitive.
+
+8. **Map Figma named type styles directly to tokens.** The Figma MCP
+   response lists named styles (e.g. `Page title / h1`, `Body / base`,
+   `Caption / sm`, `Amount display`, `Badge`). Those names *are* the
+   token mapping — don't recompute from the raw 13.5px / -0.24px
+   values:
+   - `Page title / h1` → `--text-3xl` + `--tracking-display`
+   - `Body / base` → `--text-base`
+   - `Caption / sm` → `--text-sm`
+   - `Amount display` → `--text-display` + `--tracking-display`
+   - `Badge` → `--text-2xs` + `--tracking-caps`
+
+9. **Build the states Figma doesn't show.** A Figma frame typically
+   only renders the happy path. The screen still needs: an empty state
+   (`<EmptyState>`), loading feedback, validation errors, disabled
+   wiring, focus rings (token-driven, already in `app.css`), and hover
+   transitions. If the design doesn't specify these, default to the
+   project's existing patterns — don't invent new ones and don't omit
+   them.
+
+10. **Don't ship Figma asset URLs.** The MCP returns asset constants
+    like `imgFrame = "https://figma.com/api/mcp/asset/…"` — those URLs
+    expire after 7 days. Treat them as ephemeral references for
+    *understanding* the design, never production sources. Replace each
+    with the project equivalent: an `<Icon>` glyph (extend the
+    `IconName` union if missing), a `<CurrencyPicker>` flag emoji, or
+    a file saved into `static/`.
 
 ---
 
