@@ -1,6 +1,6 @@
 ---
 name: design-system
-description: Use this skill BEFORE writing or editing any UI in finn — building a screen, page, route, form, dialog, list, button, or component. It gives you the component inventory pointer, composition recipes, anti-patterns to avoid, and the rules for translating a Figma design into the right primitives. Triggers on phrases like "build a screen", "add a page", "make a form", "create a route", "design", "component", "send screen", "convert", "contacts", "figma", any figma.com URL, or any task involving `.svelte` files under `src/routes/` or `src/lib/components/`.
+description: Use this skill BEFORE writing or editing any UI in finn — building a screen, page, route, form, dialog, list, button, or component. It gives you the component inventory pointer, composition recipes, anti-patterns to avoid, and the rules for translating a Figma design or rough sketch into the right primitives. Triggers on phrases like "build a screen", "add a page", "make a form", "create a route", "design", "component", "send screen", "convert", "contacts", "figma", "sketch", "wireframe", "mockup", any figma.com URL, any image/jpg/png input describing a UI, or any task involving `.svelte` files under `src/routes/` or `src/lib/components/`.
 ---
 
 # finn — design system skill
@@ -154,6 +154,76 @@ primitive. Common failure modes from past builds:
     with the project equivalent: an `<Icon>` glyph (extend the
     `IconName` union if missing), a `<CurrencyPicker>` flag emoji, or
     a file saved into `static/`.
+
+---
+
+## When implementing from a rough sketch
+
+A hand-drawn sketch (paper, whiteboard, napkin photo, low-fidelity wireframe)
+is **intent, not spec**. It shows what the user wants the screen to *do*,
+not exactly how it should look. Your job is to make the thing actually work
+— that means filling in everything a sketch can't capture, and using
+judgment when the sketch is ambiguous, contradictory, or impractical.
+
+This is the opposite of the Figma rules above: with Figma, fidelity to
+the source is the goal. With a sketch, fidelity to the source's *intent*
+is the goal.
+
+1. **Read the sketch for intent, not pixels.** A box labeled "TO" is a
+   recipient picker — pick the right primitive (`<Field>` + recipient
+   search, or `<List>` of contacts) based on what makes the flow work,
+   not on whether the sketch drew a square or a rectangle. Squiggles,
+   uneven spacing, and rough arrows are noise; the labels and the
+   ordering are signal.
+
+2. **Don't replicate sketch artifacts as UI.** Annotations like "Quick
+   send (contacts)", arrows pointing between regions, dashed
+   placeholders, or scratched-out alternatives are the user thinking
+   out loud — not elements to render. Translate them: a "Quick send"
+   arrow into a contacts area means *those two things connect*, not
+   "draw an arrow on the page."
+
+3. **Fill in everything the sketch omits.** A sketch typically only
+   shows the happy path of one state. The working screen needs all of:
+   empty state (`<EmptyState>`), loading, validation errors, disabled
+   wiring on the submit button, focus rings, hover transitions, and
+   error recovery. Default to the project's existing patterns
+   (`/contacts`, `/convert`) when the sketch is silent — don't invent
+   new ones, don't omit them.
+
+4. **Make logical composition decisions when the sketch is ambiguous.**
+   If two elements are drawn near each other but it's unclear whether
+   they're one row or stacked, pick whichever composition makes the
+   flow work better and is consistent with the rest of finn. The
+   sketch can't dictate `<Cluster>` vs `<Stack>` — you decide based on
+   what reads well and matches the established vocabulary.
+
+5. **Improve obviously-broken bits.** If the sketch shows the Send
+   button before the amount field, or omits a confirmation step that
+   the flow clearly needs, fix it. A sketch is a draft — the user
+   expects you to apply product sense, not ship a literal transcription
+   of a 30-second drawing. When you make a non-trivial deviation,
+   mention it briefly in your final summary so the user can push back.
+
+6. **Use existing copy, not sketch shorthand.** "TO", "AMT", "$", and
+   other abbreviations in a sketch are space-saving shorthand, not
+   final copy. Write proper labels ("Recipient", "Amount") consistent
+   with the rest of the app — unless the sketch's exact wording is
+   clearly intentional (e.g. branded terminology).
+
+7. **Pick primitives the same way you would from a brief.** The
+   decision tree in Step 2 still applies: a vertical column is
+   `<Stack>`, a row of things is `<Cluster>`, a form row is `<Field>`,
+   a currency selector is `<CurrencyPicker>`. The sketch doesn't
+   change which primitive is right — it only tells you *which screen*
+   to build.
+
+8. **When in doubt between two reasonable interpretations, pick one
+   and ship it.** Don't stop and ask the user about every ambiguity in
+   a rough drawing — that defeats the point of a sketch. Reserve
+   questions for the genuinely load-bearing decisions (e.g. "is this a
+   one-step or two-step flow?"). Surface your interpretation in the
+   final summary.
 
 ---
 
