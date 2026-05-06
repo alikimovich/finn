@@ -1,8 +1,5 @@
 <script lang="ts">
-	import Card from '$lib/components/Card.svelte';
-	import Badge from '$lib/components/Badge.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import Stack from '$lib/components/Stack.svelte';
+	import { Badge, Card, PageHeader, Stack } from '$lib/components';
 </script>
 
 <PageHeader

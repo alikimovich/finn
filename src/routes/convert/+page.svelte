@@ -1,16 +1,18 @@
 <script lang="ts">
-	import Card from '$lib/components/Card.svelte';
-	import Button from '$lib/components/Button.svelte';
-	import Cluster from '$lib/components/Cluster.svelte';
-	import CurrencyPicker from '$lib/components/CurrencyPicker.svelte';
-	import DotSep from '$lib/components/DotSep.svelte';
-	import EmptyState from '$lib/components/EmptyState.svelte';
-	import Icon from '$lib/components/Icon.svelte';
-	import Input from '$lib/components/Input.svelte';
-	import List from '$lib/components/List.svelte';
-	import ListRow from '$lib/components/ListRow.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import SectionLabel from '$lib/components/SectionLabel.svelte';
+	import {
+		Button,
+		Card,
+		Cluster,
+		CurrencyPicker,
+		DotSep,
+		EmptyState,
+		Icon,
+		Input,
+		List,
+		ListRow,
+		PageHeader,
+		SectionLabel
+	} from '$lib/components';
 	import { pairRate } from '$lib/utils/convert';
 	import {
 		formatAmount,

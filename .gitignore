@@ -7,6 +7,7 @@ node_modules
 .wrangler
 /.svelte-kit
 /build
+/storybook-static
 
 # OS
 .DS_Store
@@ -24,3 +25,6 @@ vite.config.ts.timestamp-*
 
 # Local experiment harness (scoring + run outputs)
 _experiment/
+
+# Agent worktrees
+worktrees/

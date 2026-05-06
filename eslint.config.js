@@ -12,6 +12,7 @@ import svelte from 'eslint-plugin-svelte';
 import svelteParser from 'svelte-eslint-parser';
 import tsParser from '@typescript-eslint/parser';
 import globals from 'globals';
+import finnDesignSystem from './eslint-rules/finn-design-system.js';
 
 export default [
 	js.configs.recommended,
@@ -24,6 +25,8 @@ export default [
 			'node_modules/**',
 			'_experiment/**',
 			'static/**',
+			'storybook-static/**',
+			'.storybook/**',
 		],
 	},
 
@@ -40,6 +43,14 @@ export default [
 			'svelte/no-navigation-without-resolve': 'off',
 			'svelte/no-useless-mustaches': 'off',
 		},
+	},
+
+	{
+		// `.ts` is not in ESLint's default file set under flat config, so we
+		// opt it in explicitly — otherwise standalone `.ts` files (like the
+		// per-component `index.ts` re-exports) trip "File ignored because no
+		// matching configuration was supplied."
+		files: ['**/*.ts'],
 	},
 
 	{
@@ -70,13 +81,16 @@ export default [
 			'src/routes/convert/**',
 			'src/routes/contacts/**',
 		],
+		plugins: {
+			finn: finnDesignSystem,
+		},
 		rules: {
 			'svelte/no-restricted-html-elements': [
 				'error',
 				{
 					elements: ['button'],
 					message:
-						'Use <Button> from $lib/components/Button.svelte (or <IconButton> for icon-only).',
+						'Use <Button> from $lib/components (or <IconButton> for icon-only).',
 				},
 				{
 					elements: ['select'],
@@ -90,7 +104,7 @@ export default [
 				},
 				{
 					elements: ['dialog'],
-					message: 'Use <Dialog> from $lib/components/Dialog.svelte.',
+					message: 'Use <Dialog> from $lib/components.',
 				},
 				{
 					elements: ['ul', 'ol'],
@@ -104,6 +118,10 @@ export default [
 				'error',
 				{ allowTransitions: true },
 			],
+			// Bare <input>/<textarea> must live inside a <Field> (or <SearchField>).
+			'finn/no-bare-input': 'error',
+			// Hex/rgba/px/ms literals in <style> blocks — tokens only.
+			'finn/no-css-literals': 'error',
 			'no-console': ['warn', { allow: ['warn', 'error'] }],
 		},
 	},

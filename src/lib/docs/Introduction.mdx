@@ -1,0 +1,49 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Docs/Introduction" />
+
+# finn — design system
+
+This is the live workshop for finn's UI primitives and design tokens. Use
+it as the reference when building or changing routes.
+
+## What's here
+
+- **Docs / Tokens** — every visual token with a swatch + value.
+- **Layout / Form / Containers / Lists / Page / Bits** — every component
+  with autodocs, an args table generated from per-prop JSDoc, and one
+  story per meaningful variant.
+
+The text on each component's **Docs** tab is generated from the
+`<!-- @component -->` block at the top of the `.svelte` file. The args
+table is generated from JSDoc on the `interface Props { … }`. **Update
+those at the source — Storybook reflects them automatically.**
+
+## How to use Storybook in finn
+
+1. **Before authoring a screen**, browse the relevant folder here. The
+   gallery shows every variant — pick the one that fits.
+2. **Open the component file** — `src/lib/components/{Name}/{Name}.svelte` —
+   for the JSDoc + source. Hover the prop in your editor to see the
+   same docs inline.
+3. **Use the primitive, not its raw HTML equivalent.** ESLint flags raw
+   `<button>` / `<select>` / `<svg>` in routes. The list of primitives
+   to reach for lives in the project root `CLAUDE.md`.
+
+## Adding a new component
+
+1. Sketch in Storybook first — write the story with the API you want.
+2. Implement `src/lib/components/{Name}/{Name}.svelte` until the story
+   renders. Add a sibling `index.ts` re-exporting the default (and any
+   types from the `<script module>`).
+3. Add JSDoc on every prop in the `Props` interface. The IDE hover and
+   the Storybook args table both come from this source.
+4. Add a `<!-- @component -->` block at the top of the `.svelte` file
+   for the description.
+5. Update `CLAUDE.md`'s component inventory.
+
+## Tokens
+
+See **Docs / Tokens** for the visual reference, and `src/lib/tokens.md`
+for the full written reference. Add new tokens to `src/app.css` and
+mirror them in both places.

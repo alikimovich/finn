@@ -1,19 +1,21 @@
 <script lang="ts">
-	import Avatar from '$lib/components/Avatar.svelte';
-	import Button from '$lib/components/Button.svelte';
-	import Cluster from '$lib/components/Cluster.svelte';
-	import CurrencyPicker from '$lib/components/CurrencyPicker.svelte';
-	import Dialog from '$lib/components/Dialog.svelte';
-	import DotSep from '$lib/components/DotSep.svelte';
-	import EmptyState from '$lib/components/EmptyState.svelte';
-	import Field from '$lib/components/Field.svelte';
-	import Icon from '$lib/components/Icon.svelte';
-	import IconButton from '$lib/components/IconButton.svelte';
-	import List from '$lib/components/List.svelte';
-	import ListRow from '$lib/components/ListRow.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import SearchField from '$lib/components/SearchField.svelte';
-	import Stack from '$lib/components/Stack.svelte';
+	import {
+		Avatar,
+		Button,
+		Cluster,
+		CurrencyPicker,
+		Dialog,
+		DotSep,
+		EmptyState,
+		Field,
+		Icon,
+		IconButton,
+		List,
+		ListRow,
+		PageHeader,
+		SearchField,
+		Stack
+	} from '$lib/components';
 	import { contacts } from '$lib/stores/contacts';
 	import { getCurrency } from '$lib/data/currencies';
 	import { formatRelativeTime } from '$lib/utils/format';

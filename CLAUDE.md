@@ -1,10 +1,5 @@
 # finn — agent guide
 
-This file is read by AI coding assistants (Claude Code, Cursor, etc.). It
-exists so a fresh agent can build a route or component **using the
-established design system on the first try**, without re-deriving the
-patterns by reading every file.
-
 If anything in this file is wrong or incomplete, fix it here first, then
 update the code.
 
@@ -12,21 +7,32 @@ update the code.
 
 ## Project shape
 
-- **Stack:** SvelteKit + Svelte 5 (runes mode forced) + TypeScript, Vite,
-  Bun. Plain CSS with design tokens. No Tailwind, no CSS-in-JS.
+- **Stack:** SvelteKit + Svelte 5 (runes mode forced) + TypeScript, Vite, Bun. Plain CSS with design tokens. No Tailwind, no CSS-in-JS.
 - **Routes:** `/convert` (live FX), `/rates`, `/contacts`, `/send`,
-  `/stories`, `/design` (dev token + component gallery).
+  `/stories`, `/design` (legacy in-app gallery — superseded by Storybook).
 - **Layout:** every route renders inside `+layout.svelte` with sidebar on
   the left and content centered at `--layout-content-max` (880px).
+- **Design system workshop:** `bun run storybook` (port 6006). Stories
+  are collocated next to each component. Autodocs come from the
+  `<!-- @component -->` block at the top of each `.svelte` file plus
+  per-prop JSDoc on its `Props` interface — the same JSDoc surfaces on
+  hover in your editor.
 
 ```
 src/
 ├── app.css                tokens + reset (single source of truth)
 ├── lib/
-│   ├── components/        all reusable UI lives here
+│   ├── components/        all reusable UI; one folder per component
+│   │   ├── index.ts       barrel — import from here in routes
+│   │   └── Button/
+│   │       ├── Button.svelte         the component
+│   │       ├── Button.stories.svelte Storybook stories (collocated)
+│   │       └── index.ts              re-exports default + any types
 │   ├── data/              static currency list
+│   ├── docs/              Storybook docs pages (Tokens, Introduction)
 │   ├── server/            Frankfurter client
 │   ├── stores/            localStorage-backed stores
+│   ├── tokens.md          written token reference
 │   ├── types.ts
 │   └── utils/             format, convert
 └── routes/                pages
@@ -39,18 +45,33 @@ src/
 1. **No magic values.** Never write a `px`, hex, `rgba()`, duration, or
    radius literal in component or route CSS. Every value comes from a
    token in `src/app.css`. If the right token doesn't exist, add one
-   first, document it here, then use it.
+   first, document it in `src/lib/tokens.md`, then use it.
 2. **Prefer composition over ad-hoc CSS.** If you'd otherwise write
    `display: flex; flex-direction: column; gap: var(--space-N)`, use
    `<Stack>`. If you'd write `display: flex; gap: ...`, use `<Cluster>`.
-   Drop to raw CSS only when the layout needs something a primitive can't
-   express (custom grid templates, per-child positioning).
+   Drop to raw CSS only when the layout needs something a primitive
+   can't express (custom grid templates, per-child positioning).
+
+> Composition recipes and the full anti-pattern list live in
+> `.claude/skills/design-system/SKILL.md`. Read that skill before
+> authoring or editing UI.
 
 ---
 
 ## Component inventory — what exists, when to use it
 
-Import from `$lib/components/{Name}.svelte`.
+Import as named exports from `$lib/components`:
+
+```ts
+import { Button, Card, Stack, Field, type IconName } from '$lib/components';
+```
+
+The barrel (`src/lib/components/index.ts`) re-exports every primitive
+and the few exported types (`IconName`, `StackSpace`, `ClusterSpace`).
+Each component still lives in its own folder
+(`src/lib/components/{Name}/`) with `{Name}.svelte`,
+`{Name}.stories.svelte`, and `index.ts`. Don't import via the per-folder
+path from routes; use the barrel.
 
 ### Layout primitives — reach for these first
 
@@ -103,131 +124,19 @@ Import from `$lib/components/{Name}.svelte`.
 | `Badge`     | Small uppercase status label.                                      |
 | `Sparkline` | Tiny line chart with semantic tone (`up`/`down`/`neutral`).        |
 
-### Read the JSDoc
-
-Every component has a `<!-- @component -->` block at the top with props,
-defaults, and a usage example. When in doubt, open the component file.
-
-### Live preview
-
-`/design` is a dev gallery showing every token + component variant. Run
-`bun run dev` and visit it to confirm what something looks like before
-authoring it.
-
----
-
-## Composition recipes — common page patterns
-
-### A form row inside a dialog or card
-
-```svelte
-<Stack space="4">
-  <Field label="Name">
-    <input bind:value={name} type="text" required />
-  </Field>
-  <Field label="Email" optional>
-    <input bind:value={email} type="email" />
-  </Field>
-  <Field label="Currency" as="div">
-    <CurrencyPicker selected={code} onSelect={(c) => (code = c)} />
-  </Field>
-</Stack>
-```
-
-`<input>`/`<textarea>` placed inside `<Field>` are styled automatically.
-**Don't** wrap them in your own `<label>`.
-
-### A page with a list
-
-```svelte
-<PageHeader title="Contacts" subtitle="People you send to.">
-  {#snippet actions()}
-    <Button variant="primary"><Icon name="plus" size="sm" />Add</Button>
-  {/snippet}
-</PageHeader>
-
-{#if items.length === 0}
-  <EmptyState title="No contacts yet" description="Add your first.">
-    {#snippet icon()}<Icon name="user" size="lg" />{/snippet}
-  </EmptyState>
-{:else}
-  <List space="2">
-    {#each items as item (item.id)}
-      <ListRow padding="sm">
-        <Cluster space="3" align="center">…</Cluster>
-      </ListRow>
-    {/each}
-  </List>
-{/if}
-```
-
-### An action bar / inline meta line
-
-```svelte
-<Cluster justify="between">
-  <h2>Recent</h2>
-  <Button variant="ghost">Clear</Button>
-</Cluster>
-
-<Cluster space="2">
-  <span>1 USD = 0.92 EUR</span>
-  <DotSep />
-  <span>updated 2 min ago</span>
-</Cluster>
-```
-
-### A primary action
-
-```svelte
-<Button variant="primary" size="md" onclick={submit}>Send</Button>
-```
-
-Never `<button>` directly. Never inline-style a button. Use the `variant`
-prop.
-
----
-
-## Anti-patterns — do not do these
-
-These are the things that come out of an agent that hasn't read this
-file. **Catch yourself before writing them:**
-
-1. **Raw `<button>`/`<input>`/`<label>` in a route or page-level
-   component.** Always use `<Button>`, `<Input>`, and `<Field>`. The only
-   place raw `<input>` is acceptable is *inside* a `<Field>` (which is
-   how `<Field>` is designed to be used).
-2. **`<svg>` in a route.** Always go through `<Icon>`. If a glyph is
-   missing, add it to `Icon.svelte`.
-3. **`style={{...}}` or `style="..."` on a primitive.** `<Button
-   style={{...}}>`, `<Card style={{...}}>` etc. is a code smell — it
-   means the primitive is missing a variant. Add the variant; don't
-   override.
-4. **`display: flex` + `gap: var(--space-N)` in a route's `<style>`.**
-   Use `<Stack>` or `<Cluster>` instead.
-5. **Hardcoded `12px`, `#fff`, `rgba(...)`** in any CSS. Use the token.
-6. **Custom `.row` / `.list-item` classes for vertical lists.** Use
-   `<List>` + `<ListRow>`.
-7. **Custom modal/dialog implementation.** Use `<Dialog>`.
-8. **Custom empty-state CSS.** Use `<EmptyState>`.
-9. **Wrapping a control in `<label>` yourself.** `<Field>` is the label.
-
 ---
 
 ## Tokens — what's available
 
-All tokens are CSS custom properties on `:root` in `src/app.css`. Open
-that file for the full list — the categories are:
+Tokens live as CSS custom properties on `:root` in `src/app.css`. The
+**human-readable reference** is `src/lib/tokens.md`. The **visual
+reference** is the **Docs → Tokens** Storybook page (rendered from
+`src/lib/docs/Tokens.stories.svelte`). Keep all three in sync.
 
-- **Color** — surface (3-tier neutral) + text (3-tier) + border + accent
-  + semantic (success/danger) + 7-pair avatar palette + overlay.
-- **Radius** — `--radius-sm/md/lg/pill/circle`.
-- **Space** — `--space-half/1/2/3/4/5/6/7/8` (4-pt scale + 2px micro).
-- **Sizing** — layout, control heights, control padding, icon sizes.
-- **Typography** — font family, size scale (`--text-2xs` through
-  `--text-display`), weight, tracking, leading.
-- **Shadow** — `--shadow-sm/md/lg`.
-- **Motion** — `--dur-1..5`, `--ease-standard/emphatic/spring`.
-- **Z-index** — `--z-popover` (20), `--z-dialog` (50).
+Categories: color (surface, text, border, accent, semantic, avatar
+palette), radius, space (4-pt scale + 2px micro), sizing (layout,
+control heights, icons), typography (size, weight, tracking, leading),
+shadow, motion (duration, easing), z-index.
 
 Pair `font-variant-numeric: tabular-nums` on the leaf element rendering
 amounts and rates so columns align.
@@ -236,25 +145,37 @@ amounts and rates so columns align.
 
 ## Workflow
 
-1. **Read this file** if you're starting a UI task.
-2. **Open `/design`** if unsure what something looks like.
-3. **Read the component's JSDoc** before using it.
-4. **Run `bun run check`** before considering work done.
-5. **ESLint will flag** raw controls, inline styles, and hex/px literals.
-   Don't disable rules — fix the code.
+1. **Read this file** for the inventory and import path.
+2. **Invoke the `design-system` skill** (or read its SKILL.md) for
+   recipes, anti-patterns, and the per-task decision tree.
+3. **Open Storybook** (`bun run storybook`) if unsure what something
+   looks like — every component has a collocated story.
+4. **Read the component's JSDoc** before using it (same docs show on
+   hover in your editor and on the Storybook **Docs** tab).
+5. **Run `bun run check`** before considering work done. ESLint flags
+   raw controls, inline styles, CSS literals, and bare inputs outside
+   `<Field>`. The `Stop` hook re-runs ESLint on files you edited.
 
 ---
 
 ## Adding a new component
 
-1. Sketch in `/design` first.
-2. Create `src/lib/components/Name.svelte`. Use only tokens.
-3. Add a `<!-- @component description, props, example -->` block.
-4. Add a section to `/design`'s preview page.
+1. Create `src/lib/components/{Name}/` and inside it:
+   - `{Name}.svelte` — the component (use only tokens).
+   - `{Name}.stories.svelte` — sketch the API in Storybook first.
+   - `index.ts` — `export { default } from './{Name}.svelte';` (plus
+     `export type { … } from './{Name}.svelte';` if the `<script module>`
+     exports types).
+2. Add the new component to the barrel `src/lib/components/index.ts`.
+3. Add a `<!-- @component description + example -->` block at the top
+   of `{Name}.svelte`.
+4. Add `/** … */` JSDoc to **every field** of the `Props` interface.
 5. Update this file's component inventory.
 
 ## Adding a new token
 
 1. Add to `:root` in `src/app.css` in the appropriate group.
-2. Replace any matching literal in components and routes.
-3. Render it in the corresponding `/design` token section.
+2. Add a row to `src/lib/tokens.md` with the value and intended use.
+3. Render it in `src/lib/docs/Tokens.stories.svelte` if it's
+   visually-significant (color, space, radius, shadow, typography size).
+4. Replace any matching literal across components and routes.

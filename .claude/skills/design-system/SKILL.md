@@ -1,22 +1,21 @@
 ---
 name: design-system
-description: Use this skill BEFORE writing or editing any UI in finn — building a screen, page, route, form, dialog, list, button, or component. It gives you the component inventory, the right primitive for common patterns, and the anti-patterns to avoid. Triggers on phrases like "build a screen", "add a page", "make a form", "create a route", "design", "component", "send screen", "convert", "contacts", or any task involving `.svelte` files under `src/routes/` or `src/lib/components/`.
+description: Use this skill BEFORE writing or editing any UI in finn — building a screen, page, route, form, dialog, list, button, or component. It gives you the component inventory pointer, composition recipes, and the anti-patterns to avoid. Triggers on phrases like "build a screen", "add a page", "make a form", "create a route", "design", "component", "send screen", "convert", "contacts", or any task involving `.svelte` files under `src/routes/` or `src/lib/components/`.
 ---
 
 # finn — design system skill
 
-When the user asks you to build or edit any piece of UI in finn, follow
-this skill **before** authoring code.
+Follow this **before** authoring code for any UI task.
 
-## Step 1 — Read the inventory (CLAUDE.md)
+## Step 1 — Read the inventory
 
-The repo root has `CLAUDE.md` with the full component inventory and
-composition recipes. **Read it first.** It will save you from
-re-deriving patterns by reading every file.
+The repo root `CLAUDE.md` lists every primitive, what it's for, and how
+to import it (named imports from `$lib/components`). Open it once per
+session and you'll know the menu.
 
 ## Step 2 — Match the task to a primitive
 
-Mental decision tree for the most common cases:
+Decision tree for the most common cases:
 
 - "Vertical column of fields / sections / items"  →  `<Stack>`
 - "Horizontal row of things with a gap"  →  `<Cluster>`
@@ -33,72 +32,81 @@ Mental decision tree for the most common cases:
 - "A small status label"  →  `<Badge>`
 - "A person's avatar"  →  `<Avatar>` (paired with their visible name)
 
-## Step 3 — Read the JSDoc on the primitive you picked
+## Step 3 — Read the JSDoc
 
-Each component has a `<!-- @component -->` block at the top with its
-props, defaults, and a usage example. Open the file before composing
-with it.
+Each component has a `<!-- @component -->` block at the top, plus
+per-prop `/** … */` JSDoc on the `Props` interface. Both surface in IDE
+hover and on the Storybook **Docs** tab. Open the file (or the matching
+story) before composing with a primitive you haven't used before.
 
-## Step 4 — Avoid these anti-patterns
+## Step 4 — Verify visually in Storybook
 
-The most common ways an agent goes off the rails:
+```
+bun run storybook
+```
 
-1. **Inventing a primitive.** "Let me write a custom `.row` class…" —
-   stop. Use `<List>` + `<ListRow>`.
-2. **Using raw `<button>` / `<input>` / `<select>` in a route.** Always
-   `<Button>` / `<Field>` (with bare `<input>`) / `<CurrencyPicker>`.
-3. **Inline `style={{...}}` on a primitive.** This is a smell — the
-   primitive is missing a variant. Either use a different variant or add
-   one to the primitive.
-4. **Hardcoding `12px`, `#fff`, `rgba(...)`** in component CSS. Always
-   use a token from `src/app.css` (e.g. `var(--space-3)`,
-   `var(--color-text-muted)`).
-5. **`display: flex; gap: var(--space-N)` in a route's `<style>`.** Use
-   `<Stack>` or `<Cluster>` instead.
-6. **`<svg>` directly in a route.** Add the glyph to `Icon.svelte`'s
-   `IconName` union and use `<Icon>`.
-7. **Wrapping a control in a custom `<label>`.** `<Field>` is the label.
+Storybook (port 6006) is the canonical token + component workshop. Each
+component lives in its own folder
+(`src/lib/components/{Name}/{Name}.svelte`) with the collocated
+`{Name}.stories.svelte`. For tokens, see **Docs → Tokens** (visual) and
+`src/lib/tokens.md` (written reference).
 
-## Step 5 — Verify visually
-
-`/design` is a live token + component preview gallery. If you're unsure
-how a primitive looks or composes, run `bun run dev` and visit
-`http://localhost:5173/design` — it renders every variant of every
-component.
-
-## Step 6 — Run `bun run check`
+## Step 5 — Run `bun run check`
 
 Type-check before considering work done. ESLint will additionally flag
-raw controls and inline styles — don't disable rules; fix the code.
+raw controls, inline styles, hex/px/rgba/ms literals in route CSS, and
+bare `<input>`/`<textarea>` outside `<Field>` — don't disable rules; fix
+the code. The `Stop` hook re-runs ESLint on the files you edited and
+surfaces any violations as additional context.
 
 ---
 
-## Quick reference — example: a form inside a Dialog
+## Anti-patterns — do not do these
+
+These are the things that come out of an agent that hasn't read this
+skill. **Catch yourself before writing them:**
+
+1. **Raw `<button>` / `<input>` / `<select>` / `<svg>` in a route.**
+   Use `<Button>` / `<Field>` (with bare `<input>` inside) /
+   `<CurrencyPicker>` / `<Icon>`. The only place a bare `<input>` is
+   acceptable is inside `<Field>`.
+2. **Inventing a primitive.** "Let me write a custom `.row` class…" —
+   stop. Use `<List>` + `<ListRow>`.
+3. **Custom `<label>` wrapper around a control.** `<Field>` is the
+   label.
+4. **Custom modal/dialog implementation.** Use `<Dialog>`.
+5. **Custom empty-state CSS.** Use `<EmptyState>`.
+6. **`style={…}` or `style="…"` on a primitive.** Smell — the primitive
+   is missing a variant. Add the variant; don't override.
+7. **`display: flex` + `gap: var(--space-N)` in a route's `<style>`.**
+   Use `<Stack>` or `<Cluster>`.
+8. **Hardcoded `12px`, `#fff`, `rgba(...)`, `200ms`** in CSS. Use the
+   token (`var(--space-3)`, `var(--color-text-muted)`, `var(--dur-3)`).
+
+---
+
+## Composition recipes
+
+### A form row inside a dialog or card
 
 ```svelte
-<Dialog open={isOpen} title="New contact" onClose={close}>
-  <form onsubmit={(e) => { e.preventDefault(); save(); }}>
-    <Stack space="4">
-      <Field label="Name">
-        <input bind:value={name} type="text" required />
-      </Field>
-      <Field label="Email" optional>
-        <input bind:value={email} type="email" />
-      </Field>
-      <Field label="Currency" as="div">
-        <CurrencyPicker selected={code} onSelect={(c) => (code = c)} />
-      </Field>
-    </Stack>
-  </form>
-
-  {#snippet footer()}
-    <Button variant="ghost" size="sm" onclick={close}>Cancel</Button>
-    <Button variant="primary" size="sm" onclick={save}>Save</Button>
-  {/snippet}
-</Dialog>
+<Stack space="4">
+  <Field label="Name">
+    <input bind:value={name} type="text" required />
+  </Field>
+  <Field label="Email" optional>
+    <input bind:value={email} type="email" />
+  </Field>
+  <Field label="Currency" as="div">
+    <CurrencyPicker selected={code} onSelect={(c) => (code = c)} />
+  </Field>
+</Stack>
 ```
 
-## Quick reference — example: a list page
+`<input>`/`<textarea>` placed inside `<Field>` are styled
+automatically. Don't wrap them in your own `<label>`.
+
+### A page with a list
 
 ```svelte
 <PageHeader title="Contacts" subtitle="People you send to.">
@@ -123,4 +131,37 @@ raw controls and inline styles — don't disable rules; fix the code.
     {/each}
   </List>
 {/if}
+```
+
+### An action bar / inline meta line
+
+```svelte
+<Cluster justify="between">
+  <h2>Recent</h2>
+  <Button variant="ghost">Clear</Button>
+</Cluster>
+
+<Cluster space="2">
+  <span>1 USD = 0.92 EUR</span>
+  <DotSep />
+  <span>updated 2 min ago</span>
+</Cluster>
+```
+
+### A form inside a Dialog
+
+```svelte
+<Dialog open={isOpen} title="New contact" onClose={close}>
+  <form onsubmit={(e) => { e.preventDefault(); save(); }}>
+    <Stack space="4">
+      <Field label="Name"><input bind:value={name} type="text" required /></Field>
+      <Field label="Email" optional><input bind:value={email} type="email" /></Field>
+    </Stack>
+  </form>
+
+  {#snippet footer()}
+    <Button variant="ghost" size="sm" onclick={close}>Cancel</Button>
+    <Button variant="primary" size="sm" onclick={save}>Save</Button>
+  {/snippet}
+</Dialog>
 ```

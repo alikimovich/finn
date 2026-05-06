@@ -1,11 +1,13 @@
 <script lang="ts">
-	import Cluster from '$lib/components/Cluster.svelte';
-	import DotSep from '$lib/components/DotSep.svelte';
-	import EmptyState from '$lib/components/EmptyState.svelte';
-	import List from '$lib/components/List.svelte';
-	import ListRow from '$lib/components/ListRow.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import Sparkline from '$lib/components/Sparkline.svelte';
+	import {
+		Cluster,
+		DotSep,
+		EmptyState,
+		List,
+		ListRow,
+		PageHeader,
+		Sparkline
+	} from '$lib/components';
 	import { formatRate, formatRateDate } from '$lib/utils/format';
 	import { getCurrency } from '$lib/data/currencies';
 	import type { RateSeries } from '$lib/types';
@@ -97,7 +99,7 @@
 	.flags {
 		position: relative;
 		width: var(--control-height-md);
-		height: 22px;
+		height: var(--icon-lg);
 		flex-shrink: 0;
 	}
 
@@ -105,7 +107,7 @@
 		position: absolute;
 		font-size: var(--text-2xl);
 		line-height: var(--leading-tight);
-		filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.1));
+		filter: drop-shadow(var(--shadow-sm));
 	}
 
 	.flag-from {
@@ -114,8 +116,8 @@
 	}
 
 	.flag-to {
-		left: 14px;
-		top: 4px;
+		left: var(--icon-sm);
+		top: var(--space-1);
 	}
 
 	.codes {

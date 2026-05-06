@@ -1,24 +1,27 @@
 <script lang="ts">
-	import Avatar from '$lib/components/Avatar.svelte';
-	import Badge from '$lib/components/Badge.svelte';
-	import Button from '$lib/components/Button.svelte';
-	import Card from '$lib/components/Card.svelte';
-	import Cluster from '$lib/components/Cluster.svelte';
-	import CurrencyPicker from '$lib/components/CurrencyPicker.svelte';
-	import Dialog from '$lib/components/Dialog.svelte';
-	import DotSep from '$lib/components/DotSep.svelte';
-	import EmptyState from '$lib/components/EmptyState.svelte';
-	import Field from '$lib/components/Field.svelte';
-	import Icon, { type IconName } from '$lib/components/Icon.svelte';
-	import IconButton from '$lib/components/IconButton.svelte';
-	import Input from '$lib/components/Input.svelte';
-	import List from '$lib/components/List.svelte';
-	import ListRow from '$lib/components/ListRow.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import SearchField from '$lib/components/SearchField.svelte';
-	import SectionLabel from '$lib/components/SectionLabel.svelte';
-	import Sparkline from '$lib/components/Sparkline.svelte';
-	import Stack from '$lib/components/Stack.svelte';
+	import {
+		Avatar,
+		Badge,
+		Button,
+		Card,
+		Cluster,
+		CurrencyPicker,
+		Dialog,
+		DotSep,
+		EmptyState,
+		Field,
+		Icon,
+		IconButton,
+		Input,
+		List,
+		ListRow,
+		PageHeader,
+		SearchField,
+		SectionLabel,
+		Sparkline,
+		Stack,
+		type IconName
+	} from '$lib/components';
 	import type { CurrencyCode } from '$lib/types';
 
 	const colorTokens = [
