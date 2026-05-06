@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { tick } from 'svelte';
 	import IconButton from './IconButton.svelte';
 	import Icon from './Icon.svelte';
 
@@ -13,10 +14,51 @@
 
 	let { open, title, onClose, children, footer }: Props = $props();
 
+	let panelEl: HTMLDivElement | undefined = $state();
+	let titleId = `dialog-title-${Math.random().toString(36).slice(2, 9)}`;
+	let returnFocusEl: HTMLElement | null = null;
+
+	const FOCUSABLE =
+		'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+	$effect(() => {
+		if (open && panelEl) {
+			returnFocusEl = document.activeElement as HTMLElement | null;
+			tick().then(() => {
+				const first = panelEl?.querySelector<HTMLElement>(FOCUSABLE);
+				first?.focus();
+			});
+		} else if (!open && returnFocusEl) {
+			returnFocusEl.focus();
+			returnFocusEl = null;
+		}
+	});
+
 	function onKeydown(e: KeyboardEvent) {
-		if (open && e.key === 'Escape') {
+		if (!open) return;
+		if (e.key === 'Escape') {
 			e.preventDefault();
 			onClose();
+			return;
+		}
+		if (e.key === 'Tab' && panelEl) {
+			const focusables = Array.from(
+				panelEl.querySelectorAll<HTMLElement>(FOCUSABLE)
+			).filter((el) => !el.hasAttribute('inert'));
+			if (focusables.length === 0) {
+				e.preventDefault();
+				return;
+			}
+			const first = focusables[0];
+			const last = focusables[focusables.length - 1];
+			const active = document.activeElement as HTMLElement | null;
+			if (e.shiftKey && active === first) {
+				e.preventDefault();
+				last.focus();
+			} else if (!e.shiftKey && active === last) {
+				e.preventDefault();
+				first.focus();
+			}
 		}
 	}
 
@@ -30,17 +72,20 @@
 {#if open}
 	<div
 		class="backdrop"
-		role="dialog"
-		aria-modal="true"
-		aria-label={title}
 		onclick={onBackdropClick}
-		onkeydown={(e) => e.key === 'Escape' && onClose()}
-		tabindex="-1"
+		role="presentation"
 	>
-		<div class="panel" role="document">
+		<div
+			class="panel"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby={title ? titleId : undefined}
+			aria-label={title ? undefined : 'Dialog'}
+			bind:this={panelEl}
+		>
 			{#if title}
 				<header class="head">
-					<h2>{title}</h2>
+					<h2 id={titleId}>{title}</h2>
 					<IconButton aria-label="Close dialog" onclick={onClose}>
 						<Icon name="close" size="sm" />
 					</IconButton>

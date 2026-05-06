@@ -58,18 +58,23 @@ Semantic colors are reserved for state.
 | `--radius-pill`  | 999 px | Currency picker trigger                         |
 | `--radius-circle`| 50%    | Avatars, brand dot, swap control                |
 
-### Space (4-pt scale)
+### Space (4-pt scale + half-step)
 
-| Token       | Px   | Typical use                          |
-| ----------- | ---- | ------------------------------------ |
-| `--space-1` | 4    | Hairline gaps, badge padding         |
-| `--space-2` | 8    | Tight cluster gaps, icon + label     |
-| `--space-3` | 12   | Default row padding-x                |
-| `--space-4` | 16   | Default row padding-y, form gap      |
-| `--space-5` | 24   | Card padding-md, page gutter         |
-| `--space-6` | 32   | Card padding-lg, content gutter      |
-| `--space-7` | 48   | Section spacing, content top pad     |
-| `--space-8` | 64   | Content bottom pad                   |
+| Token          | Px   | Typical use                          |
+| -------------- | ---- | ------------------------------------ |
+| `--space-half` | 2    | Micro gaps inside dense rows         |
+| `--space-1`    | 4    | Hairline gaps, badge padding         |
+| `--space-2`    | 8    | Tight cluster gaps, icon + label     |
+| `--space-3`    | 12   | Default row padding-x                |
+| `--space-4`    | 16   | Default row padding-y, form gap      |
+| `--space-5`    | 24   | Card padding-md, page gutter         |
+| `--space-6`    | 32   | Card padding-lg, content gutter      |
+| `--space-7`    | 48   | Section spacing, content top pad     |
+| `--space-8`    | 64   | Content bottom pad                   |
+
+`--space-half` exists for micro-gaps that 4 px would loosen too much
+(e.g. between `IconButton`s in a row). Stack/Cluster/List support it via
+`space="half"`.
 
 ### Sizing
 
@@ -287,6 +292,112 @@ as `<label>` by default (clicking the label focuses its input); pass
 `<input>` and `<textarea>` placed inside `Field` are styled automatically
 via the `:global()` selectors on the field wrapper.
 
+### Layout primitives
+
+#### `Stack`
+
+Vertical flex with a tokenized gap. Use it whenever you'd otherwise write
+`display: flex; flex-direction: column; gap: var(--space-N)`.
+
+```svelte
+<Stack space="4">
+  <Field label="Name">…</Field>
+  <Field label="Email">…</Field>
+</Stack>
+```
+
+| Prop    | Values                                              | Default     |
+| ------- | --------------------------------------------------- | ----------- |
+| `space` | `'1' \| '2' \| '3' \| '4' \| '5' \| '6' \| '7' \| '8'` | `'3'`       |
+| `align` | `'start' \| 'center' \| 'end' \| 'stretch'`         | `'stretch'` |
+
+Half-step gaps (`--space-half`) are not exposed here — they're nearly
+always component-internal.
+
+#### `Cluster`
+
+Horizontal flex with wrap-by-default. The horizontal counterpart to
+`Stack`. Used for inline meta lines (with `DotSep`), button groups,
+icon + label rows, and any "things in a line, with a gap".
+
+```svelte
+<Cluster space="2">
+  <span>1 USD = 0.92 EUR</span>
+  <DotSep />
+  <span>1 EUR = 1.09 USD</span>
+</Cluster>
+
+<Cluster justify="between">
+  <h2>Recent</h2>
+  <Button variant="ghost">Clear</Button>
+</Cluster>
+```
+
+| Prop      | Values                                                       | Default    |
+| --------- | ------------------------------------------------------------ | ---------- |
+| `space`   | `'1' \| '2' \| '3' \| '4' \| '5' \| '6'`                     | `'2'`      |
+| `align`   | `'start' \| 'center' \| 'end' \| 'baseline' \| 'stretch'`    | `'center'` |
+| `justify` | `'start' \| 'center' \| 'end' \| 'between'`                  | (none)     |
+| `wrap`    | `boolean`                                                    | `true`     |
+| `as`      | `'div' \| 'span'`                                            | `'div'`    |
+
+#### `DotSep`
+
+The middle-dot separator (`·`) used between meta items. Always
+`--color-text-subtle`. No props.
+
+```svelte
+<Cluster space="2">
+  <span>foo</span> <DotSep /> <span>bar</span> <DotSep /> <span>baz</span>
+</Cluster>
+```
+
+### Lists
+
+#### `List`
+
+Resets a `<ul>` and stacks its `<li>` children with a tokenized gap.
+
+```svelte
+<List space="2">
+  <ListRow as="a" href="/convert?from=USD&to=EUR">…</ListRow>
+  <ListRow as="a" href="/convert?from=EUR&to=GBP">…</ListRow>
+</List>
+```
+
+| Prop    | Values                                       | Default |
+| ------- | -------------------------------------------- | ------- |
+| `space` | `'half' \| '1' \| '2' \| '3' \| '4'`         | `'2'`   |
+
+#### `ListRow`
+
+The hover-bordered row used in every list across the app (recent
+conversions, contacts, rates). Renders an `<li>` wrapping an inner
+element selected by `as`.
+
+```svelte
+<!-- static row -->
+<ListRow padding="sm">…</ListRow>
+
+<!-- linked row -->
+<ListRow as="a" href={`/convert?from=${from}&to=${to}`} padding="md">…</ListRow>
+
+<!-- click-to-load row -->
+<ListRow as="button" onclick={() => load(item)} padding="sm">…</ListRow>
+```
+
+| Prop         | Values                       | Default |
+| ------------ | ---------------------------- | ------- |
+| `as`         | `'div' \| 'a' \| 'button'`   | `'div'` |
+| `padding`    | `'sm' \| 'md'`               | `'sm'`  |
+| `href`       | `string` (when `as="a"`)     | —       |
+| `onclick`    | `(e) => void` (when `as="button"`) | — |
+| `aria-label` | `string`                     | —       |
+
+The row provides the surface (background, border, hover, padding); inner
+layout (grid, flex, etc.) is the consumer's responsibility — usually a
+`Cluster` or a small grid wrapper.
+
 ### Containers
 
 #### `Card`
@@ -425,6 +536,12 @@ component.
   (e.g. `--color-danger-soft`) instead.
 - **Component CSS is scoped.** Use `:global()` only when styling
   user-supplied children (as `Field` does for `<input>`/`<textarea>`).
+- **Prefer `Stack` and `Cluster` over ad-hoc flex CSS.** Reach for them
+  whenever the only thing you'd write is `flex-direction + gap`. Drop to
+  raw flex/grid when you need things they don't express (positioning,
+  custom alignment per-child, complex grid templates).
+- **List + ListRow for any vertical list of clickable rows.** No more
+  per-page `.row` classes.
 - **No `<svg>` in routes.** Always go through `<Icon>`. To add a new
   glyph, add it to the `IconName` union and the switch in `Icon.svelte`.
 - **Page chrome stays consistent.** Every route opens with `<PageHeader>`

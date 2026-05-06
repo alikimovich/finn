@@ -1,7 +1,11 @@
 <script lang="ts">
-	import Sparkline from '$lib/components/Sparkline.svelte';
+	import Cluster from '$lib/components/Cluster.svelte';
+	import DotSep from '$lib/components/DotSep.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';
+	import List from '$lib/components/List.svelte';
+	import ListRow from '$lib/components/ListRow.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
+	import Sparkline from '$lib/components/Sparkline.svelte';
 	import { formatRate, formatRateDate } from '$lib/utils/format';
 	import { getCurrency } from '$lib/data/currencies';
 	import type { RateSeries } from '$lib/types';
@@ -14,24 +18,24 @@
 {#if data.series.length === 0}
 	<EmptyState description="Couldn't load rates right now. Try again in a moment." />
 {:else}
-	<ul class="list">
+	<List space="2">
 		{#each data.series as s (s.from + s.to)}
 			{@const fromC = getCurrency(s.from)}
 			{@const toC = getCurrency(s.to)}
 			{@const up = s.changePct >= 0}
-			<li>
-				<a class="row" href={`/convert?from=${s.from}&to=${s.to}`}>
+			<ListRow as="a" padding="md" href={`/convert?from=${s.from}&to=${s.to}`}>
+				<div class="grid">
 					<div class="pair">
 						<div class="flags" aria-hidden="true">
 							<span class="flag flag-from">{fromC?.flag}</span>
 							<span class="flag flag-to">{toC?.flag}</span>
 						</div>
 						<div class="codes">
-							<div class="code-line">
+							<Cluster space="2" align="center">
 								<span class="code">{s.from}</span>
 								<span class="arrow" aria-hidden="true">→</span>
 								<span class="code">{s.to}</span>
-							</div>
+							</Cluster>
 							<div class="names">
 								{fromC?.name} → {toC?.name}
 							</div>
@@ -48,54 +52,39 @@
 					<div class="rate">
 						<div class="rate-value">{formatRate(s.current)}</div>
 						<div class="rate-meta">
-							<span class="change" class:up class:down={!up}>
-								{up ? '▲' : '▼'}
-								{Math.abs(s.changePct).toFixed(2)}%
-							</span>
-							<span class="dot-sep">·</span>
-							<span class="range">
-								{formatRate(s.low)} – {formatRate(s.high)}
-							</span>
+							<Cluster space="2" align="center" justify="end">
+								<span class="change" class:up class:down={!up}>
+									<span aria-hidden="true">{up ? '▲' : '▼'}</span>
+									<span class="sr-only">{up ? 'up' : 'down'}</span>
+									{Math.abs(s.changePct).toFixed(2)}%
+								</span>
+								<DotSep />
+								<span class="range">
+									{formatRate(s.low)} – {formatRate(s.high)}
+								</span>
+							</Cluster>
 						</div>
 					</div>
-				</a>
-			</li>
+				</div>
+			</ListRow>
 		{/each}
-	</ul>
+	</List>
 
 	<div class="footnote">
-		<span>1 unit of base currency in target · 7-day change · 30-day low/high</span>
-		<span class="dot-sep">·</span>
-		<span>ECB · {formatRateDate(data.series[0].asOf)}</span>
+		<Cluster space="2">
+			<span>1 unit of base currency in target · 7-day change · 30-day low/high</span>
+			<DotSep />
+			<span>ECB · {formatRateDate(data.series[0].asOf)}</span>
+		</Cluster>
 	</div>
 {/if}
 
 <style>
-	.list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2);
-	}
-
-	.row {
+	.grid {
 		display: grid;
 		grid-template-columns: 1fr auto auto;
 		align-items: center;
 		gap: var(--space-5);
-		padding: var(--space-4) var(--space-5);
-		background: var(--color-surface);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-md);
-		transition:
-			border-color var(--dur-2) var(--ease-standard),
-			background-color var(--dur-2) var(--ease-standard);
-	}
-
-	.row:hover {
-		border-color: var(--color-border-strong);
 	}
 
 	.pair {
@@ -132,14 +121,11 @@
 	.codes {
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: var(--space-half);
 		min-width: 0;
 	}
 
-	.code-line {
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
+	.code {
 		font-weight: var(--weight-semibold);
 		font-size: var(--text-md);
 		letter-spacing: var(--tracking-wide);
@@ -175,11 +161,7 @@
 	}
 
 	.rate-meta {
-		display: flex;
-		align-items: center;
-		justify-content: flex-end;
-		gap: var(--space-2);
-		margin-top: 2px;
+		margin-top: var(--space-half);
 		font-size: var(--text-xs);
 		color: var(--color-text-muted);
 	}
@@ -188,7 +170,7 @@
 		font-weight: var(--weight-semibold);
 		display: inline-flex;
 		align-items: center;
-		gap: 2px;
+		gap: var(--space-half);
 	}
 
 	.change.up {
@@ -199,10 +181,6 @@
 		color: var(--color-danger);
 	}
 
-	.dot-sep {
-		color: var(--color-text-subtle);
-	}
-
 	.range {
 		color: var(--color-text-subtle);
 	}
@@ -211,9 +189,6 @@
 		margin-top: var(--space-5);
 		padding-top: var(--space-4);
 		border-top: 1px solid var(--color-border);
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-2);
 		font-size: var(--text-xs);
 		color: var(--color-text-subtle);
 	}

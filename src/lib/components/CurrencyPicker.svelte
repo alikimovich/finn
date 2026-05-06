@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { currencies, popularCodes } from '$lib/data/currencies';
 	import type { Currency, CurrencyCode } from '$lib/types';
 	import SearchField from './SearchField.svelte';
@@ -9,13 +10,15 @@
 		selected: CurrencyCode;
 		exclude?: CurrencyCode;
 		onSelect: (code: CurrencyCode) => void;
+		'aria-label'?: string;
 	}
 
-	let { selected, exclude, onSelect }: Props = $props();
+	let { selected, exclude, onSelect, 'aria-label': ariaLabel }: Props = $props();
 
 	let open = $state(false);
 	let query = $state('');
 	let triggerEl: HTMLButtonElement | undefined = $state();
+	let popoverEl: HTMLDivElement | undefined = $state();
 
 	const selectedCurrency = $derived(
 		currencies.find((c) => c.code === selected) ?? currencies[0]
@@ -39,8 +42,13 @@
 		);
 	});
 
-	function toggle() {
+	async function toggle() {
 		open = !open;
+		if (open) {
+			await tick();
+			const search = popoverEl?.querySelector<HTMLInputElement>('input');
+			search?.focus();
+		}
 	}
 
 	function close() {
@@ -51,10 +59,51 @@
 	function pick(code: CurrencyCode) {
 		onSelect(code);
 		close();
+		triggerEl?.focus();
 	}
 
-	function onKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape') {
+	function focusOption(index: number) {
+		const options = popoverEl?.querySelectorAll<HTMLButtonElement>('[role="option"]');
+		if (!options || options.length === 0) return;
+		const clamped = Math.max(0, Math.min(index, options.length - 1));
+		options[clamped]?.focus();
+	}
+
+	function focusFirstOption() {
+		focusOption(0);
+	}
+
+	function focusLastOption() {
+		const options = popoverEl?.querySelectorAll<HTMLButtonElement>('[role="option"]');
+		if (options) focusOption(options.length - 1);
+	}
+
+	function onListKeydown(e: KeyboardEvent) {
+		if (!open) return;
+		const target = e.target as HTMLElement;
+		const options = Array.from(
+			popoverEl?.querySelectorAll<HTMLButtonElement>('[role="option"]') ?? []
+		);
+		const idx = options.indexOf(target as HTMLButtonElement);
+		if (e.key === 'ArrowDown') {
+			e.preventDefault();
+			if (idx === -1) focusFirstOption();
+			else focusOption(idx + 1);
+		} else if (e.key === 'ArrowUp') {
+			e.preventDefault();
+			if (idx === -1) focusLastOption();
+			else focusOption(idx - 1);
+		} else if (e.key === 'Home') {
+			e.preventDefault();
+			focusFirstOption();
+		} else if (e.key === 'End') {
+			e.preventDefault();
+			focusLastOption();
+		}
+	}
+
+	function onWindowKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape' && open) {
 			close();
 			triggerEl?.focus();
 		}
@@ -64,8 +113,7 @@
 		if (!open) return;
 		const target = e.target as Node | null;
 		if (!target) return;
-		const popover = document.querySelector('[data-currency-popover]');
-		if (popover?.contains(target)) return;
+		if (popoverEl?.contains(target)) return;
 		if (triggerEl?.contains(target)) return;
 		close();
 	}
@@ -77,7 +125,7 @@
 	});
 </script>
 
-<svelte:window onkeydown={onKeydown} />
+<svelte:window onkeydown={onWindowKeydown} />
 
 <div class="picker">
 	<button
@@ -86,6 +134,9 @@
 		type="button"
 		aria-haspopup="listbox"
 		aria-expanded={open}
+		aria-label={ariaLabel
+			? `${ariaLabel}: ${selectedCurrency.code} ${selectedCurrency.name}`
+			: `Selected currency: ${selectedCurrency.code} ${selectedCurrency.name}`}
 		onclick={toggle}
 	>
 		<span class="flag" aria-hidden="true">{selectedCurrency.flag}</span>
@@ -96,10 +147,15 @@
 	</button>
 
 	{#if open}
-		<div class="popover" data-currency-popover role="dialog" aria-label="Select currency">
+		<div
+			class="popover"
+			bind:this={popoverEl}
+			onkeydown={onListKeydown}
+			role="presentation"
+		>
 			<SearchField bind:value={query} placeholder="Search currency" variant="plain" />
 
-			<div class="list" role="listbox">
+			<div class="list" role="listbox" aria-label="Currencies" tabindex="-1">
 				{#if !query.trim() && popular.length > 0}
 					<div class="group-label">
 						<SectionLabel text="Popular" />
@@ -116,6 +172,9 @@
 							<span class="flag" aria-hidden="true">{currency.flag}</span>
 							<span class="row-code">{currency.code}</span>
 							<span class="row-name">{currency.name}</span>
+							{#if currency.code === selected}
+								<span class="check"><Icon name="check" size="sm" /></span>
+							{/if}
 						</button>
 					{/each}
 					<div class="group-label">
@@ -134,6 +193,9 @@
 						<span class="flag" aria-hidden="true">{currency.flag}</span>
 						<span class="row-code">{currency.code}</span>
 						<span class="row-name">{currency.name}</span>
+						{#if currency.code === selected}
+							<span class="check"><Icon name="check" size="sm" /></span>
+						{/if}
 					</button>
 				{:else}
 					<div class="empty">No matches</div>
@@ -231,17 +293,30 @@
 		background: var(--color-accent-soft);
 	}
 
+	/* Inset focus so the outline isn't clipped by the popover. */
+	.row:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: -2px;
+	}
+
 	.row-code {
 		font-weight: var(--weight-semibold);
 		min-width: var(--control-height-md);
 	}
 
 	.row-name {
+		flex: 1;
 		color: var(--color-text-muted);
 		font-size: var(--text-sm);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	.check {
+		display: inline-flex;
+		color: var(--color-accent);
+		flex-shrink: 0;
 	}
 
 	.empty {

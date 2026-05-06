@@ -56,7 +56,6 @@
 		flex: 1;
 		min-width: 0;
 		border: none;
-		outline: none;
 		background: transparent;
 		font-size: var(--text-base);
 		color: var(--color-text);

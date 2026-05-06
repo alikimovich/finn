@@ -37,7 +37,6 @@
 	{width}
 	{height}
 	viewBox="0 0 {width} {height}"
-	role="img"
 	aria-hidden="true"
 	class="sparkline tone-{tone}"
 >

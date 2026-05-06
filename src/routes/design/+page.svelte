@@ -3,17 +3,22 @@
 	import Badge from '$lib/components/Badge.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Card from '$lib/components/Card.svelte';
+	import Cluster from '$lib/components/Cluster.svelte';
 	import CurrencyPicker from '$lib/components/CurrencyPicker.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
+	import DotSep from '$lib/components/DotSep.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';
 	import Field from '$lib/components/Field.svelte';
 	import Icon, { type IconName } from '$lib/components/Icon.svelte';
 	import IconButton from '$lib/components/IconButton.svelte';
 	import Input from '$lib/components/Input.svelte';
+	import List from '$lib/components/List.svelte';
+	import ListRow from '$lib/components/ListRow.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import SearchField from '$lib/components/SearchField.svelte';
 	import SectionLabel from '$lib/components/SectionLabel.svelte';
 	import Sparkline from '$lib/components/Sparkline.svelte';
+	import Stack from '$lib/components/Stack.svelte';
 	import type { CurrencyCode } from '$lib/types';
 
 	const colorTokens = [
@@ -48,8 +53,8 @@
 	const radiusTokens = ['--radius-sm', '--radius-md', '--radius-lg', '--radius-pill'];
 
 	const spaceTokens = [
-		'--space-1', '--space-2', '--space-3', '--space-4',
-		'--space-5', '--space-6', '--space-7', '--space-8'
+		'--space-half', '--space-1', '--space-2', '--space-3',
+		'--space-4', '--space-5', '--space-6', '--space-7', '--space-8'
 	];
 
 	const textTokens = [
@@ -119,7 +124,10 @@
 		{ id: 'page-headers', label: 'Page header' },
 		{ id: 'currency-picker', label: 'Currency picker' },
 		{ id: 'sparklines', label: 'Sparklines' },
-		{ id: 'dialog', label: 'Dialog' }
+		{ id: 'dialog', label: 'Dialog' },
+		{ id: 'stack-cluster', label: 'Stack & Cluster' },
+		{ id: 'lists', label: 'List & ListRow' },
+		{ id: 'dot-sep', label: 'DotSep' }
 	];
 </script>
 
@@ -482,6 +490,86 @@
 	</Dialog>
 </section>
 
+<!-- ===== Stack & Cluster ===== -->
+<section id="stack-cluster" class="section">
+	<SectionLabel as="h2" text="Stack & Cluster" />
+	<p class="hint">Layout primitives. Stack stacks vertically, Cluster wraps horizontally.</p>
+
+	<div class="subhead">Stack — space="3"</div>
+	<div class="card-shell">
+		<Stack space="3">
+			<div class="block">First</div>
+			<div class="block">Second</div>
+			<div class="block">Third</div>
+		</Stack>
+	</div>
+
+	<div class="subhead">Cluster — default (space="2", align="center")</div>
+	<div class="card-shell">
+		<Cluster>
+			<Badge variant="neutral">tag</Badge>
+			<Badge variant="soft">tag</Badge>
+			<Badge variant="success">tag</Badge>
+			<Badge variant="neutral">tag</Badge>
+		</Cluster>
+	</div>
+
+	<div class="subhead">Cluster — justify="between"</div>
+	<div class="card-shell">
+		<Cluster justify="between">
+			<span>Left</span>
+			<span>Right</span>
+		</Cluster>
+	</div>
+</section>
+
+<!-- ===== List & ListRow ===== -->
+<section id="lists" class="section">
+	<SectionLabel as="h2" text="List & ListRow" />
+
+	<div class="subhead">as="div" — static row</div>
+	<List space="2">
+		<ListRow padding="sm">
+			<Cluster justify="between"><span>Static row</span><span>meta</span></Cluster>
+		</ListRow>
+		<ListRow padding="sm">
+			<Cluster justify="between"><span>Another row</span><span>meta</span></Cluster>
+		</ListRow>
+	</List>
+
+	<div class="subhead">as="button" — clickable</div>
+	<List space="half">
+		<ListRow as="button" padding="sm" onclick={() => {}}>
+			<Cluster justify="between"><span>Click me</span><span>→</span></Cluster>
+		</ListRow>
+		<ListRow as="button" padding="sm" onclick={() => {}}>
+			<Cluster justify="between"><span>Or me</span><span>→</span></Cluster>
+		</ListRow>
+	</List>
+
+	<div class="subhead">as="a" with padding="md"</div>
+	<List space="2">
+		<ListRow as="a" href="#lists" padding="md">
+			<Cluster justify="between"><span>Anchor row</span><span>→</span></Cluster>
+		</ListRow>
+	</List>
+</section>
+
+<!-- ===== DotSep ===== -->
+<section id="dot-sep" class="section">
+	<SectionLabel as="h2" text="DotSep" />
+	<p class="hint">Subtle middle-dot separator. Pair with Cluster for inline meta lines.</p>
+	<div class="card-shell">
+		<Cluster space="2">
+			<span>1 USD = 0.92 EUR</span>
+			<DotSep />
+			<span>1 EUR = 1.09 USD</span>
+			<DotSep />
+			<span>ECB · 2026-05-05</span>
+		</Cluster>
+	</div>
+</section>
+
 <style>
 	.rail {
 		display: flex;
@@ -704,5 +792,13 @@
 		color: var(--color-text-muted);
 		font-size: var(--text-sm);
 		margin-bottom: var(--space-4);
+	}
+
+	.block {
+		padding: var(--space-3) var(--space-4);
+		background: var(--color-accent-soft);
+		border-radius: var(--radius-sm);
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
 	}
 </style>

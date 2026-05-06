@@ -1,11 +1,16 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import Cluster from '$lib/components/Cluster.svelte';
 	import CurrencyPicker from '$lib/components/CurrencyPicker.svelte';
+	import DotSep from '$lib/components/DotSep.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';
+	import Icon from '$lib/components/Icon.svelte';
+	import Input from '$lib/components/Input.svelte';
+	import List from '$lib/components/List.svelte';
+	import ListRow from '$lib/components/ListRow.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import SectionLabel from '$lib/components/SectionLabel.svelte';
-	import Icon from '$lib/components/Icon.svelte';
 	import { pairRate } from '$lib/utils/convert';
 	import {
 		formatAmount,
@@ -51,17 +56,13 @@
 		}
 	});
 
-	function onFromInput(e: Event) {
-		const target = e.target as HTMLInputElement;
-		fromAmount = target.value;
+	function onFromInput() {
 		lastEdited = 'from';
 	}
 
-	function onToInput(e: Event) {
-		const target = e.target as HTMLInputElement;
-		toAmount = target.value;
+	function onToInput() {
 		lastEdited = 'to';
-		const n = Number(target.value.replace(/,/g, '')) || 0;
+		const n = Number(toAmount.replace(/,/g, '')) || 0;
 		fromAmount = rate ? String(+(n / rate).toFixed(2)) : '0';
 	}
 
@@ -115,11 +116,12 @@
 			<SectionLabel text="You send" />
 			<div class="row-content">
 				<CurrencyPicker selected={from} exclude={to} onSelect={selectFrom} />
-				<input
-					class="amount-input"
+				<Input
+					bind:value={fromAmount}
+					size="xl"
+					align="right"
 					type="text"
 					inputmode="decimal"
-					value={fromAmount}
 					oninput={onFromInput}
 					aria-label="Amount in {from}"
 				/>
@@ -142,11 +144,12 @@
 			<SectionLabel text="They get" />
 			<div class="row-content">
 				<CurrencyPicker selected={to} exclude={from} onSelect={selectTo} />
-				<input
-					class="amount-input"
+				<Input
+					bind:value={toAmount}
+					size="xl"
+					align="right"
 					type="text"
 					inputmode="decimal"
-					value={toAmount}
 					oninput={onToInput}
 					aria-label="Amount in {to}"
 				/>
@@ -155,15 +158,13 @@
 	</div>
 
 	<div class="rate-meta">
-		<span class="rate">
-			1 {from} = {formatRate(rate)} {to}
-		</span>
-		<span class="dot-sep">·</span>
-		<span>
-			1 {to} = {formatRate(inverseRate)} {from}
-		</span>
-		<span class="dot-sep">·</span>
-		<span class="source">ECB · {formatRateDate(data.date)}</span>
+		<Cluster space="2">
+			<span class="rate">1 {from} = {formatRate(rate)} {to}</span>
+			<DotSep />
+			<span>1 {to} = {formatRate(inverseRate)} {from}</span>
+			<DotSep />
+			<span class="source">ECB · {formatRateDate(data.date)}</span>
+		</Cluster>
 	</div>
 
 	<div class="actions">
@@ -189,28 +190,32 @@
 			description="Nothing yet. Save a conversion to keep it here."
 		/>
 	{:else}
-		<ul class="list">
+		<List space="half">
 			{#each $recentConversions as item (item.id)}
-				<li>
-					<button class="recent-row" type="button" onclick={() => loadConversion(item)}>
-						<span class="recent-amounts">
-							<span class="from-amt">
+				<ListRow
+					as="button"
+					padding="sm"
+					onclick={() => loadConversion(item)}
+				>
+					<Cluster space="3" align="center" justify="between">
+						<Cluster space="2" align="center">
+							<span class="amt">
 								{formatAmount(item.amount, item.from)} {item.from}
 							</span>
 							<span class="arrow" aria-hidden="true">→</span>
-							<span class="to-amt">
+							<span class="amt">
 								{formatAmount(item.result, item.to)} {item.to}
 							</span>
-						</span>
-						<span class="recent-meta">
-							<span>{formatRate(item.rate)}</span>
-							<span class="dot-sep">·</span>
-							<span>{formatRelativeTime(item.savedAt)}</span>
-						</span>
-					</button>
-				</li>
+						</Cluster>
+						<Cluster space="2" align="center">
+							<span class="meta">{formatRate(item.rate)}</span>
+							<DotSep />
+							<span class="meta">{formatRelativeTime(item.savedAt)}</span>
+						</Cluster>
+					</Cluster>
+				</ListRow>
 			{/each}
-		</ul>
+		</List>
 	{/if}
 </section>
 
@@ -231,27 +236,6 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-4);
-	}
-
-	.amount-input {
-		flex: 1;
-		min-width: 0;
-		background: transparent;
-		border: none;
-		outline: none;
-		font-size: var(--text-display);
-		font-weight: var(--weight-semibold);
-		letter-spacing: var(--tracking-display);
-		line-height: var(--leading-snug);
-		color: var(--color-text);
-		font-family: inherit;
-		font-variant-numeric: tabular-nums;
-		padding: var(--space-1) 0;
-		text-align: right;
-	}
-
-	.amount-input::placeholder {
-		color: var(--color-text-subtle);
 	}
 
 	.divider {
@@ -287,10 +271,6 @@
 	}
 
 	.rate-meta {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: var(--space-2);
 		padding-top: var(--space-4);
 		margin-top: var(--space-4);
 		border-top: 1px solid var(--color-border);
@@ -302,10 +282,6 @@
 	.rate {
 		font-weight: var(--weight-medium);
 		color: var(--color-text);
-	}
-
-	.dot-sep {
-		color: var(--color-text-subtle);
 	}
 
 	.source {
@@ -339,56 +315,18 @@
 		color: var(--color-text);
 	}
 
-	.list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-	}
-
-	.recent-row {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: var(--space-4);
-		width: 100%;
-		padding: var(--space-3) var(--space-4);
-		border-radius: var(--radius-md);
-		background: var(--color-surface);
-		border: 1px solid var(--color-border);
-		text-align: left;
-		transition:
-			border-color var(--dur-2) var(--ease-standard),
-			background-color var(--dur-2) var(--ease-standard);
-	}
-
-	.recent-row:hover {
-		border-color: var(--color-border-strong);
-	}
-
-	.recent-amounts {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-2);
-		font-variant-numeric: tabular-nums;
-		font-size: var(--text-base);
-	}
-
-	.from-amt,
-	.to-amt {
+	.amt {
 		color: var(--color-text);
 		font-weight: var(--weight-medium);
+		font-variant-numeric: tabular-nums;
+		font-size: var(--text-base);
 	}
 
 	.arrow {
 		color: var(--color-text-subtle);
 	}
 
-	.recent-meta {
-		display: inline-flex;
-		gap: var(--space-2);
+	.meta {
 		color: var(--color-text-subtle);
 		font-size: var(--text-sm);
 		font-variant-numeric: tabular-nums;

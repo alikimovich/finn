@@ -2,6 +2,7 @@
 	import Card from '$lib/components/Card.svelte';
 	import Badge from '$lib/components/Badge.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
+	import Stack from '$lib/components/Stack.svelte';
 </script>
 
 <PageHeader
@@ -10,26 +11,17 @@
 />
 
 <Card>
-	<div class="placeholder">
+	<Stack space="3" align="start">
 		<Badge variant="soft">Coming soon</Badge>
 		<p>
 			Linked banks, contacts, and one-tap transfers in the same FX engine that
 			powers Convert.
 		</p>
-	</div>
+	</Stack>
 </Card>
 
 <style>
-	.placeholder {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: var(--space-3);
-		padding: var(--space-3) 0;
-	}
-
-	.placeholder p {
+	p {
 		max-width: 60ch;
-		margin: 0;
 	}
 </style>

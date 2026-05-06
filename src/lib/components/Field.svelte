@@ -66,7 +66,6 @@
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-md);
 		padding: var(--space-2) var(--space-3);
-		outline: none;
 		transition: border-color var(--dur-2) var(--ease-standard);
 	}
 

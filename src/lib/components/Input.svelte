@@ -29,7 +29,6 @@
 		background: transparent;
 		border: 1px solid transparent;
 		border-radius: var(--radius-md);
-		outline: none;
 		transition:
 			border-color var(--dur-2) var(--ease-standard),
 			background-color var(--dur-2) var(--ease-standard);
