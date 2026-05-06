@@ -24,7 +24,7 @@
 				</svg>
 			{/snippet}
 		</NavItem>
-		<NavItem href="/rates" label="Rates" soon>
+		<NavItem href="/rates" label="Rates">
 			{#snippet icon()}
 				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
 					<path d="M2 12 6 8l3 3 5-7" />
@@ -36,7 +36,7 @@
 
 	<nav class="nav" aria-label="Network">
 		<div class="section-label">People</div>
-		<NavItem href="/contacts" label="Contacts" soon>
+		<NavItem href="/contacts" label="Contacts">
 			{#snippet icon()}
 				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
 					<circle cx="8" cy="6" r="3" />

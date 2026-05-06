@@ -217,7 +217,7 @@
 	.popover {
 		position: absolute;
 		top: calc(100% + 6px);
-		right: 0;
+		left: 0;
 		width: 320px;
 		max-height: 380px;
 		background: var(--surface);

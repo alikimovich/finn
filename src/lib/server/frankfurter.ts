@@ -1,4 +1,4 @@
-import type { RatesResponse } from '$lib/types';
+import type { CurrencyCode, RatesResponse, TimeseriesResponse } from '$lib/types';
 
 const BASE_URL = 'https://api.frankfurter.dev/v1';
 
@@ -16,4 +16,24 @@ export async function fetchLatestRates(
 		data.rates = { ...data.rates, [base]: 1 };
 	}
 	return data;
+}
+
+export async function fetchTimeseries(
+	fetchFn: typeof fetch,
+	from: CurrencyCode,
+	to: CurrencyCode,
+	startDate: string
+): Promise<TimeseriesResponse> {
+	const url = `${BASE_URL}/${startDate}..?base=${encodeURIComponent(from)}&symbols=${encodeURIComponent(to)}`;
+	const res = await fetchFn(url);
+	if (!res.ok) {
+		throw new Error(`Frankfurter timeseries failed: ${res.status}`);
+	}
+	return (await res.json()) as TimeseriesResponse;
+}
+
+export function isoDaysAgo(days: number, today = new Date()): string {
+	const d = new Date(today);
+	d.setUTCDate(d.getUTCDate() - days);
+	return d.toISOString().slice(0, 10);
 }

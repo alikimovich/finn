@@ -13,6 +13,8 @@
 	import { getCurrency } from '$lib/data/currencies';
 	import type { Conversion, CurrencyCode } from '$lib/types';
 
+	import { page } from '$app/state';
+
 	interface PageData {
 		base: CurrencyCode;
 		date: string;
@@ -21,11 +23,16 @@
 
 	let { data }: { data: PageData } = $props();
 
-	let from = $state<CurrencyCode>('USD');
-	let to = $state<CurrencyCode>('EUR');
-	let fromAmount = $state<string>('100');
+	const initialFrom = page.url.searchParams.get('from') ?? 'USD';
+	const initialTo = page.url.searchParams.get('to') ?? 'EUR';
+	const initialAmount = page.url.searchParams.get('amount') ?? '100';
+
+	let from = $state<CurrencyCode>(initialFrom);
+	let to = $state<CurrencyCode>(initialTo);
+	let fromAmount = $state<string>(initialAmount);
 	let lastEdited = $state<'from' | 'to'>('from');
 	let savedFlash = $state(false);
+	let swapRotation = $state(0);
 
 	const rate = $derived(pairRate(data.rates, data.base, from, to));
 	const inverseRate = $derived(rate ? 1 / rate : 0);
@@ -59,8 +66,8 @@
 		const prevFrom = from;
 		from = to;
 		to = prevFrom;
-		// Keep the "from" amount stable so the result recomputes from new pair.
 		lastEdited = 'from';
+		swapRotation += 180;
 	}
 
 	function selectFrom(code: CurrencyCode) {
@@ -109,6 +116,7 @@
 		<div class="row">
 			<div class="row-label">You send</div>
 			<div class="row-content">
+				<CurrencyPicker selected={from} exclude={to} onSelect={selectFrom} />
 				<input
 					class="amount-input"
 					type="text"
@@ -117,7 +125,6 @@
 					oninput={onFromInput}
 					aria-label="Amount in {from}"
 				/>
-				<CurrencyPicker selected={from} exclude={to} onSelect={selectFrom} />
 			</div>
 		</div>
 
@@ -125,6 +132,7 @@
 			<button
 				class="swap"
 				type="button"
+				style="--swap-rot: {swapRotation}deg"
 				onclick={swap}
 				aria-label="Swap currencies"
 			>
@@ -146,6 +154,7 @@
 		<div class="row">
 			<div class="row-label">They get</div>
 			<div class="row-content">
+				<CurrencyPicker selected={to} exclude={from} onSelect={selectTo} />
 				<input
 					class="amount-input"
 					type="text"
@@ -154,7 +163,6 @@
 					oninput={onToInput}
 					aria-label="Amount in {to}"
 				/>
-				<CurrencyPicker selected={to} exclude={from} onSelect={selectTo} />
 			</div>
 		</div>
 	</div>
@@ -274,6 +282,7 @@
 		font-family: inherit;
 		font-variant-numeric: tabular-nums;
 		padding: var(--space-1) 0;
+		text-align: right;
 	}
 
 	.amount-input::placeholder {
@@ -289,9 +298,8 @@
 
 	.swap {
 		position: absolute;
-		left: 0;
+		left: 50%;
 		top: 50%;
-		transform: translateY(-50%);
 		width: 32px;
 		height: 32px;
 		border-radius: 50%;
@@ -301,19 +309,16 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
+		transform: translate(-50%, -50%) rotate(var(--swap-rot, 0deg));
 		transition:
 			background-color 120ms ease,
 			color 120ms ease,
-			transform 200ms ease;
+			transform 360ms cubic-bezier(0.5, 1.4, 0.4, 1);
 	}
 
 	.swap:hover {
 		background: var(--accent-soft);
 		color: var(--text);
-	}
-
-	.swap:active {
-		transform: translateY(-50%) rotate(180deg);
 	}
 
 	.rate-meta {
