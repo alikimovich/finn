@@ -1,12 +1,11 @@
 <script lang="ts">
-	import Card from '$lib/components/Card.svelte';
+	import AmountField from '$lib/components/AmountField.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import Card from '$lib/components/Card.svelte';
 	import Cluster from '$lib/components/Cluster.svelte';
-	import CurrencyPicker from '$lib/components/CurrencyPicker.svelte';
 	import DotSep from '$lib/components/DotSep.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';
 	import Icon from '$lib/components/Icon.svelte';
-	import Input from '$lib/components/Input.svelte';
 	import List from '$lib/components/List.svelte';
 	import ListRow from '$lib/components/ListRow.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
@@ -112,21 +111,14 @@
 
 <Card padding="lg">
 	<div class="converter">
-		<div class="row">
-			<SectionLabel text="You send" />
-			<div class="row-content">
-				<CurrencyPicker selected={from} exclude={to} onSelect={selectFrom} />
-				<Input
-					bind:value={fromAmount}
-					size="xl"
-					align="right"
-					type="text"
-					inputmode="decimal"
-					oninput={onFromInput}
-					aria-label="Amount in {from}"
-				/>
-			</div>
-		</div>
+		<AmountField
+			label="You send"
+			bind:value={fromAmount}
+			currency={from}
+			excludeCurrency={to}
+			onCurrencySelect={selectFrom}
+			oninput={onFromInput}
+		/>
 
 		<div class="divider">
 			<button
@@ -140,21 +132,14 @@
 			</button>
 		</div>
 
-		<div class="row">
-			<SectionLabel text="They get" />
-			<div class="row-content">
-				<CurrencyPicker selected={to} exclude={from} onSelect={selectTo} />
-				<Input
-					bind:value={toAmount}
-					size="xl"
-					align="right"
-					type="text"
-					inputmode="decimal"
-					oninput={onToInput}
-					aria-label="Amount in {to}"
-				/>
-			</div>
-		</div>
+		<AmountField
+			label="They get"
+			bind:value={toAmount}
+			currency={to}
+			excludeCurrency={from}
+			onCurrencySelect={selectTo}
+			oninput={onToInput}
+		/>
 	</div>
 
 	<div class="rate-meta">
@@ -223,19 +208,7 @@
 	.converter {
 		display: flex;
 		flex-direction: column;
-	}
-
-	.row {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-1);
-		padding: var(--space-3) 0;
-	}
-
-	.row-content {
-		display: flex;
-		align-items: center;
-		gap: var(--space-4);
+		gap: var(--space-3);
 	}
 
 	.divider {
