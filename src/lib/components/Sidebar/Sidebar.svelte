@@ -20,7 +20,7 @@
 		<NavItem href="/convert" label="Convert">
 			{#snippet icon()}<Icon name="convert" />{/snippet}
 		</NavItem>
-		<NavItem href="/send" label="Send" soon>
+		<NavItem href="/send" label="Send">
 			{#snippet icon()}<Icon name="send" />{/snippet}
 		</NavItem>
 		<NavItem href="/rates" label="Rates">

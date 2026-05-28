@@ -40,19 +40,7 @@ per-prop `/** … */` JSDoc on the `Props` interface. Both surface in IDE
 hover and on the Storybook **Docs** tab. Open the file (or the matching
 story) before composing with a primitive you haven't used before.
 
-## Step 4 — Verify visually in Storybook
-
-```
-bun run storybook
-```
-
-Storybook (port 6006) is the canonical token + component workshop. Each
-component lives in its own folder
-(`src/lib/components/{Name}/{Name}.svelte`) with the collocated
-`{Name}.stories.svelte`. For tokens, see **Docs → Tokens** (visual) and
-`src/lib/tokens.md` (written reference).
-
-## Step 5 — Run `bun run check`
+## Step 4 — Run `bun run check`
 
 Type-check before considering work done. ESLint will additionally flag
 raw controls, inline styles, hex/px/rgba/ms literals in route CSS, and
