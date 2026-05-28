@@ -24,3 +24,9 @@ vite.config.ts.timestamp-*
 
 # Local experiment harness (scoring + run outputs)
 _experiment/
+
+# Storybook build output
+storybook-static/
+
+# Claude Code local state
+.claude/
