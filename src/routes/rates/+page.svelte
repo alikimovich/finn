@@ -10,7 +10,11 @@
 	import { getCurrency } from '$lib/data/currencies';
 	import type { RateSeries } from '$lib/types';
 
-	let { data }: { data: { series: RateSeries[] } } = $props();
+	interface Props {
+		data: { series: RateSeries[] };
+	}
+
+	let { data }: Props = $props();
 </script>
 
 <PageHeader title="Rates" subtitle="30-day trend for the pairs you watch." />

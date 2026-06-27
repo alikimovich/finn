@@ -1,7 +1,12 @@
 import adapter from '@sveltejs/adapter-auto';
+import dsgnStamp from './.dsgn/dsgn-svelte-stamp.mjs';
+
+const dev = process.env.NODE_ENV !== 'production';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
+	// Dev-only: dsgn markup preprocessor stamps data-dsgn-source on elements.
+	preprocess: dev ? [dsgnStamp()] : [],
 	compilerOptions: {
 		// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
 		runes: ({ filename }) => (filename.split(/[/\\]/).includes('node_modules') ? undefined : true)

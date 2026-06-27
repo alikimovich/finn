@@ -12,7 +12,7 @@
 
 	<nav class="nav" aria-label="Primary">
 		<SectionLabel text="Money" />
-		<NavItem href="/convert" label="Convert">
+		<NavItem soon={false} href="/convert" label="Convert">
 			{#snippet icon()}<Icon name="convert" />{/snippet}
 		</NavItem>
 		<NavItem href="/send" label="Send" soon>

@@ -1,0 +1,37 @@
+Find the reusable UI component source files in this repo (e.g. src/components/**,
+src/lib/components/**, app/components/**) — adapt to the project's actual layout.
+
+For each component, add two pieces of documentation inline in the source file:
+
+1) TOP-OF-FILE BLOCK — in the framework's native doc syntax:
+     - Svelte:    <!-- @component … --> above <script>
+     - React/TSX: /** … */ JSDoc on the default-exported component
+     - Vue SFC:   JSDoc on defineComponent, or <!-- @component … --> above <script>
+   It must contain:
+     - One short paragraph: what the component is, and when to use it
+       (and when NOT to, if a sibling primitive covers a nearby case).
+     - A Props bullet list — ONE LINE per prop: name + a 5–10-word gist.
+       Do not duplicate the per-prop JSDoc nuance here; this is an index,
+       not the full doc.
+     - An @example block with 2–3 realistic usages.
+
+2) PER-PROP JSDOC — a /** … */ block on every field of the Props type/interface.
+   This is what shows on hover in the editor, and is the ONLY place the
+   full per-prop description lives.
+     - Lead with PURPOSE, not type ("the main action on a screen", not
+       "the primary variant"). The type is already on the field.
+     - If the prop is a literal union, gloss EACH value briefly.
+     - Tag defaults with @default 'value'.
+
+Rules for the documentation itself:
+  - Describe, don't prescribe. No "MUST", "never", "always".
+  - Don't invent claims about usage elsewhere ("paired with Form in route X").
+    If you want to make such a claim, grep to verify first; otherwise omit it.
+  - Per-prop JSDoc: ≤ ~25 words of prose, EXCLUDING any @default / @example /
+    other tags. The cap constrains description, not metadata.
+  - File-block paragraph: ≤ ~80 words.
+  - File-block Props list: each bullet ≤ ~12 words (it's an index, not a doc).
+  - Skip a prop's JSDoc only if its name + type are fully self-evident
+    (rare — variants and sizes almost always need value glosses).
+  - Documentation only. Do not rename, reorder, add, or remove props.
+    Do not change logic, markup, or styles.

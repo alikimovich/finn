@@ -1,0 +1,22 @@
+Find the file(s) in this repo that define the visual design vocabulary —
+named values for color, spacing, typography, radius, shadow, motion, etc.
+(e.g. CSS custom properties, theme/tokens config, design system constants).
+
+For each value, add an inline comment, in the file's native comment syntax,
+that documents:
+  - its semantic role (what it represents, not its literal value)
+  - when to use it vs. its nearest siblings
+  - any non-obvious constraint (must read on X, paired with Y, etc.)
+
+Group related values under section-header comments if not already grouped.
+Do not change any values, names, or order. Do not add new tokens.
+
+Rules for the comments themselves:
+  - Describe, don't prescribe. No "MUST", "never", "do not", "always".
+    If a rule isn't already enforced in the file, it isn't a rule.
+  - Don't invent claims about usage elsewhere ("set in the reset",
+    "paired with X in component Y", "triggers scroll at Z"). If you want
+    to make such a claim, grep to verify first; otherwise omit it.
+  - ≤ ~15 words per value. If you can't justify a comment in 15 words,
+    the name is doing its job — skip the value entirely.
+  - Skip any value whose name already fully explains it.

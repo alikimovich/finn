@@ -1,0 +1,120 @@
+Set up an ESLint gate + Claude Code Stop hook that enforces this project's
+design-system invariants at the call site. The goal: a raw <button> or hex
+literal in a route file fails the build instead of being honor-code.
+
+INTROSPECT THE REPO FIRST. Before writing any config or rule, discover:
+  - The framework (Svelte, React, Vue, etc.) and any existing eslint config.
+  - The component library directory (where primitives live) vs. the
+    route/page directory (where the rules should fire).
+  - The actual names of these primitives, by reading the library directory.
+    For EACH of these raw elements, positively verify whether a primitive
+    exists in the library — list every component file before deciding:
+        button     → Button / IconButton equivalent
+        select     → Select / Picker equivalent
+        svg        → Icon primitive
+        dialog     → Dialog / Modal primitive
+        ul / ol    → List + Row primitives
+        textarea   → Field-wrapper variants (handled by no-bare-input)
+        a          → Link primitive (if one exists)
+    Ban each raw element whose primitive exists. Skip ONLY when the
+    primitive truly doesn't exist. Don't be conservative — under-banning
+    leaves the gate with holes.
+  - The labelled-form-row primitive(s) — there may be more than one
+    (e.g. Field + SearchField + AmountField). Collect them ALL for the
+    no-bare-input ancestor check.
+  - The token stylesheet (global file with --color-*, --space-*, --dur-*)
+    so error messages name the right token category and path.
+
+  Do NOT use placeholder names. Use the real component names from the repo.
+
+PRODUCE FOUR ARTIFACTS:
+
+1) `eslint.config.js` (flat config):
+   - Enable the framework's recommended config + the project's parser setup.
+   - Top-level `ignores` for build output (node_modules, dist, .svelte-kit,
+     build, etc. — adapt to the repo).
+   - One block scoped to the route directory only (NOT the library) that:
+       * Wires in the in-repo plugin from artifact #2.
+       * Uses the framework's no-restricted-html-elements (or equivalent)
+         to ban each raw element that has a primitive (see introspection).
+         Every restriction's `message` names the actual primitive
+         ("Use <Button> from $lib/components, or <IconButton> for icon-only.").
+       * Bans inline `style=` via the no-inline-styles rule
+         (`allowTransitions: true` where supported).
+       * Enables the two custom rules from artifact #2.
+   - Turn OFF any recommended-config rule that is repo-wide noise (e.g.
+     `no-unused-vars` when TypeScript handles it) with a comment naming why.
+   - The library directory is exempt IMPLICITLY because `files:` is scoped
+     to routes. Do not add the library path to `ignores:`.
+
+2) `eslint-rules/<project>-design-system.js` — in-repo plugin, two rules:
+
+   a) `no-bare-input` — bare <input>/<textarea> is allowed inside ANY of
+      the labelled-form-row primitives discovered above (Field, SearchField,
+      AmountField, etc. — collect them all), banned elsewhere in routes.
+      Walk the AST parent chain to detect the ancestor. Exempt
+      `<input type="hidden">`. Use the framework's AST node names
+      (SvelteElement / JSXElement / etc.).
+
+   b) `no-css-literals` — flag hex (3/4/6/8 digit), rgb()/rgba(), Npx, Nms
+      inside the framework's style-block node. CRITICAL details:
+        * Exempt `0px`, `0ms`, AND `1px` (universal CSS hairline).
+          Without this the rule fires on every border in the codebase.
+        * Strip /* … */ block comments before regex, replacing each non-
+          newline char with a space so line/column offsets stay accurate.
+        * Use `sourceCode.getLocFromIndex(baseOffset + m.index)` so the
+          error underline points exactly at the literal.
+        * Capture the FULL rgb()/rgba() call (paren-balance to find the
+          closing paren) so the message names the whole literal, not just
+          `rgba(`.
+        * Error messages name the token category and the path to the
+          token reference, e.g.
+          "Hex colour `{{match}}` — use a `var(--color-…)` token from
+          src/app.css instead."
+
+   Header comment on the plugin file summarising what each rule catches
+   and why the stock rules can't.
+
+3) `.claude/hooks/<name>.mjs` — Claude Code Stop hook (executable, shebang):
+   - Read JSON payload from stdin: { transcript_path, cwd, stop_hook_active }.
+   - If `stop_hook_active` is true, exit 0 (avoid loops).
+   - Parse the transcript JSONL; collect file_paths from Edit/Write/MultiEdit
+     tool_use blocks, filtered to the project's route-eligible files (the
+     same scope as the gate — e.g. .svelte files under src/routes).
+   - If no eligible files, exit 0.
+   - Run `node_modules/.bin/eslint --format=json --no-warn-ignored <files>`.
+   - On ESLint errors, write to stdout:
+       { "decision": "block", "reason": "<formatted violation list>" }
+     so Claude continues fixing instead of stopping.
+   - Pass through silently (exit 0) on parse errors, missing eslint binary,
+     or unexpected exit codes — never break the user's session.
+
+4) `.claude/settings.json` — register the Stop hook:
+       { "hooks": { "Stop": [ { "hooks": [ { "type": "command",
+         "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/<name>.mjs"
+       } ] } ] } }
+   If `settings.json` already exists, MERGE — do not overwrite.
+
+AFTER WRITING ALL FOUR:
+  - Install any missing ESLint deps (plugin, parser, globals) with bun.
+  - Run lint once and report every violation it surfaces in existing route
+    code.
+  - If the recommended config produces violations that are NOT design-
+    system invariants (e.g. svelte/no-navigation-without-resolve,
+    svelte/no-useless-mustaches, style cosmetics), turn those specific
+    rules off in a repo-wide rules block with a comment naming the rule
+    and why it doesn't apply here. The design-system gate is the signal
+    you want loud; recommended-config noise around it dilutes that signal.
+  - DO NOT silently add failing paths to `ignores`. Either report them for
+    the user to fix, OR if you exempt a path because fixing is out of
+    scope, add a comment ABOVE the entry stating what condition would
+    remove it ("predates these rules; rewrites are out of scope").
+
+Rules for the work itself:
+  - Don't invent primitives that aren't in the repo.
+  - Don't add `// eslint-disable` to make existing code pass.
+  - Don't widen the `files:` glob to include the library directory.
+
+When done, report: framework detected, primitives discovered, files
+created, deps installed, design-system violations found, and any
+recommended-config rules you turned off (with reasons).

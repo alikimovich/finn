@@ -1,0 +1,220 @@
+Create a build-with-design-system skill at
+`.claude/skills/build-with-design-system/SKILL.md`.
+
+The skill's job: tell agents (and humans) HOW TO USE this project's
+design system when building UI. The skill is NOT the inventory — that
+lives in component source files (top-of-file @component blocks +
+per-prop JSDoc). The skill is the recipes, anti-patterns, and decision
+trees that aren't obvious from reading the inventory.
+
+GROWTH MODEL — IMPORTANT.
+SKILL.md is the entry point: a scannable index, ~250 lines at most.
+It is loaded into context the moment the trigger fires, so keep it
+tight. Patterns, recipes, and longer rules live in companion files
+alongside SKILL.md, linked from it and read on demand:
+
+    .claude/skills/build-with-design-system/
+    ├── SKILL.md                    ← entry point (this file)
+    ├── patterns/
+    │   ├── form-row.md             ← one composition pattern per file
+    │   ├── list-page.md
+    │   └── action-bar.md
+    └── rules/
+        └── currency-amount.md      ← deeper project-specific rules
+
+On day 1, you may produce SKILL.md alone — that's fine. As patterns
+accumulate (5+), split them out. Either way, SKILL.md links to
+companion files by relative path so the agent can open them.
+
+INTROSPECT THE REPO FIRST.
+  - Find the component library directory and list every primitive by
+    real name.
+  - Find the token stylesheet (src/app.css or equivalent) and confirm
+    its token category prefixes (--color-*, --space-*, --dur-*, etc.).
+  - Find the route directory and pick 2–3 existing screens that show
+    good composition — they're recipe sources AND cited references.
+  - Open each primitive's top-of-file @component block and per-prop
+    JSDoc. Mine them for:
+      * "for X, use Y instead" lines        → anti-patterns
+      * Default values and prop semantics   → recipe details
+  - Check eslint.config.js (if it exists) for what the linter bans —
+    every banned element is implicitly an anti-pattern.
+  - Check package.json for the actual check/lint script name; the
+    skill names that command verbatim.
+  - Check what other design-related skills the project has access to
+    (e.g. Anthropic's `frontend-design`, `web-animation-design`,
+    `emil-design-engineering`). Reference them in the cross-reference
+    section below as complementary, not as dependencies.
+
+PRODUCE: `.claude/skills/build-with-design-system/SKILL.md`
+
+FRONTMATTER:
+  ---
+  name: build-with-design-system
+  description: Use this skill BEFORE writing or editing any UI in this
+    project — building a screen, page, route, form, dialog, list,
+    button, or component. It gives the component inventory pointer,
+    decision tree, composition recipes, anti-patterns, and the rules
+    for translating a Figma design or rough sketch into the right
+    primitives. Triggers on phrases like "build a screen", "add a
+    page", "make a form", "create a route", "design", "component",
+    "figma", "sketch", "wireframe", "mockup", any figma.com URL, any
+    image input describing a UI, or any task touching <real route
+    extensions> files under <real route dir> or <real library dir>.
+  ---
+
+  Substitute the bracketed bits with the real extensions and paths
+  (e.g. `.svelte` files under `src/routes/` or `src/lib/components/`).
+  The description MUST start with "Use this skill BEFORE…" — that
+  phrasing reliably gets the skill loaded ahead of authoring.
+
+BODY — SEVEN SECTIONS in this order:
+
+1) READ THE INVENTORY.
+   One short paragraph telling the agent that every primitive carries
+   its own docs at the top of its source file (a @component / JSDoc
+   block describing what it is, when to use it, when NOT to, props,
+   and @example). Point at the components directory and the token
+   stylesheet by real path. Don't duplicate the inventory.
+
+2) DECISION TREE: task → primitive.
+   At least 8 bullets in the form
+       `"natural-language task description"  →  <RealPrimitiveName>`
+   For every entry with a common wrong instinct, add the negative in
+   parentheses: `(never raw <button>)`, `(don't wrap <input> in your
+   own <label>)`. Cover at minimum: vertical layout, horizontal
+   layout, form row, button, icon, dialog/modal, list of rows, empty
+   state, page heading. Add any domain-specific patterns this app
+   uses (an amount input, a currency picker, etc.).
+
+3) READ THE COMPONENT DOCS.
+   Two sentences telling the agent to open the source of any primitive
+   it hasn't used before. The @component block gives "when to use vs
+   when NOT to"; the per-prop JSDoc gives prop semantics and value
+   glosses for unions.
+
+4) RUN THE CHECKS.
+   Name the project's check command verbatim (look it up in
+   package.json — e.g. `bun run check`, `bun run lint`). Name what
+   the linter blocks: raw <button>/<svg>/<dialog>/<ul>/<ol> in routes,
+   inline `style=` attributes, hex/rgb/px/ms literals in <style>
+   blocks, bare <input>/<textarea> outside the field wrappers. Tell
+   the agent: when the gate fires, FIX the code — don't add
+   `// eslint-disable`.
+
+5) ANTI-PATTERNS.
+   A numbered list of at least 6 items. Each item: one specific
+   mistake, followed by the right thing, naming a real primitive in
+   the fix. Mine these sources:
+     * Every element the ESLint gate bans → anti-pattern with the
+       primitive that replaces it.
+     * Every "for X, use Y instead" line in a @component block →
+       anti-pattern ("Don't use Input directly for currency amounts —
+       use AmountField").
+     * Smell patterns: inventing a custom `.row` class instead of
+       using List+ListRow; wrapping <input> in a hand-rolled <label>
+       instead of <Field>; inline style overrides on a primitive
+       (the primitive is missing a variant — add the variant, don't
+       override); hardcoded px/hex in CSS.
+   Show wrong-vs-right where it's faster than prose:
+       ❌ `<button class="primary">Save</button>`
+       ✅ `<Button onclick={save}>Save</Button>`
+   When the same anti-pattern needs more than 3 lines to explain,
+   move it to `rules/<name>.md` and link to it from this list.
+
+6) COMPOSITION RECIPES.
+   Three to six short copy-paste-able snippets covering patterns that
+   recur in the app. Find them by READING 2–3 real routes in the
+   route directory and abstracting the structure. Each recipe is a
+   short framework-syntax block using real primitive names. Below
+   each snippet, one line annotating any non-obvious choice.
+
+   When a recipe needs more than ~15 lines of code, more than one
+   snippet, or any extended commentary, move it to
+   `patterns/<name>.md` and link to it from this section. The
+   inline recipes here are the "head" of the index; the companion
+   files are the body.
+
+   Recipes to consider:
+     * A form row inside a dialog
+     * A page = header + list-of-rows + empty-state
+     * An action bar (Cluster justify="between") with primary +
+       secondary buttons
+     * A field with a leading picker/icon
+     * Any pattern the existing routes use 3+ times
+
+7) CROSS-REFERENCES.
+   A short section pointing at any complementary skills the agent
+   should load alongside this one for concerns this skill doesn't
+   cover:
+     - General design-engineering principles (motion timing,
+       typographic rhythm, microinteractions, a11y): point at
+       `frontend-design` (Anthropic) if available, or the
+       equivalent installed skill (e.g. `emil-design-engineering`,
+       `web-animation-design`).
+     - Token definitions: link to the token stylesheet and any
+       human-readable token reference (e.g. `src/lib/tokens.md`).
+   Frame these as complements: "this skill is for project-specific
+   recipes; for general design-engineering principles, also load X."
+   The project skill must work standalone if those skills aren't
+   installed.
+
+PLUS TWO SPECIALIZED SUBSECTIONS at the end of SKILL.md:
+
+A) WHEN IMPLEMENTING FROM FIGMA — fidelity to the source IS the goal.
+   Numbered list covering: map named type styles directly to
+   primitives (don't recompute from px), read the row before
+   composing (two on a row = one Cluster), don't relabel copy,
+   render the visual state shown (filled primary = primary Button
+   even if logic suggests disabled), map every literal to a token,
+   recognize existing primitives (don't build parallel div trees),
+   build states Figma doesn't show (empty/loading/error/focus),
+   don't ship Figma asset URLs (they expire), point at 1–2 real
+   route files as established compositions.
+
+B) WHEN IMPLEMENTING FROM A ROUGH SKETCH — the OPPOSITE philosophy:
+   fidelity to INTENT, not pixels. State this opposition explicitly
+   so the agent doesn't apply Figma rules to a napkin photo. Cover:
+   read for intent not pixels, don't replicate sketch artifacts as
+   UI, fill in everything the sketch omits, make composition
+   decisions when ambiguous, improve obviously-broken bits (and
+   surface non-trivial deviations in the summary), use proper copy
+   not shorthand, pick one when two reasonable interpretations
+   exist.
+
+STYLE RULES for SKILL.md:
+  - Imperatives over prose. "Use the Stack primitive." not "Stack
+    should be used when…"
+  - Show wrong vs right inline where it's faster than two paragraphs.
+  - Cite real file paths so the agent can open them. At least TWO
+    real route paths must be cited.
+  - Keep SKILL.md itself ~250 lines max. It's the index; longer
+    content moves into `patterns/` or `rules/`.
+  - No emojis.
+  - No "proposal" / RFC workflow language — this project doesn't
+    have that process.
+
+STYLE RULES for companion files (`patterns/<name>.md`, `rules/<name>.md`):
+  - Each file covers ONE pattern or ONE rule. Don't bundle.
+  - Start with a one-sentence summary of what it covers.
+  - Include the full code snippet (recipes) or worked example
+    (rules), inline. These files are read on demand, so length is
+    less constrained — but every line still needs to earn its keep.
+  - End with cross-links to related patterns/rules if any.
+
+CONSTRAINTS:
+  - Use the ACTUAL primitive names from this repo. Verify each one
+    exists by listing the library directory before naming it.
+  - Cite at least two real route file paths as reference compositions.
+  - Anti-patterns and recipes must reference real components — never
+    use placeholders like `<MyButton>` or `<SomeList>`.
+  - Don't invent primitives, routes, or recipes that don't exist.
+  - Don't fabricate anti-patterns from generic advice; every numbered
+    item should trace to a real lint rule, a real "use X instead"
+    line in a @component block, or a real composition mistake the
+    primitives are designed to prevent.
+
+When done, report: primitives referenced (count + list), routes
+cited (with paths), check command identified, anti-pattern count,
+recipe count, SKILL.md line count, and any companion files created
+(with paths).

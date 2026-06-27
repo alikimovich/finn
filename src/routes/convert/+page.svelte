@@ -28,7 +28,11 @@
 		rates: Record<CurrencyCode, number>;
 	}
 
-	let { data }: { data: PageData } = $props();
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	const initialFrom = page.url.searchParams.get('from') ?? 'USD';
 	const initialTo = page.url.searchParams.get('to') ?? 'EUR';
