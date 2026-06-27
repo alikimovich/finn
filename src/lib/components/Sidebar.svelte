@@ -23,16 +23,6 @@
 		</NavItem>
 	</nav>
 
-	<nav class="nav" aria-label="Network">
-		<SectionLabel text="People" />
-		<NavItem href="/contacts" label="Contacts">
-			{#snippet icon()}<Icon name="people" />{/snippet}
-		</NavItem>
-		<NavItem href="/stories" label="Stories" soon>
-			{#snippet icon()}<Icon name="stories" />{/snippet}
-		</NavItem>
-	</nav>
-
 	<div class="footer">
 		<span class="hint">v0.1 · ECB rates via Frankfurter</span>
 	</div>
