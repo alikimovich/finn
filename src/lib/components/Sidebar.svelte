@@ -12,7 +12,7 @@
 
 	<nav class="nav" aria-label="Primary">
 		<SectionLabel text="Money" />
-		<NavItem href="/convert" label="Convert">
+		<NavItem soon={false} href="/convert" label="Convert">
 			{#snippet icon()}<Icon name="convert" />{/snippet}
 		</NavItem>
 		<NavItem href="/send" label="Send" soon>
@@ -20,16 +20,6 @@
 		</NavItem>
 		<NavItem href="/rates" label="Rates">
 			{#snippet icon()}<Icon name="rates" />{/snippet}
-		</NavItem>
-	</nav>
-
-	<nav class="nav" aria-label="Network">
-		<SectionLabel text="People" />
-		<NavItem href="/contacts" label="Contacts">
-			{#snippet icon()}<Icon name="people" />{/snippet}
-		</NavItem>
-		<NavItem href="/stories" label="Stories" soon>
-			{#snippet icon()}<Icon name="stories" />{/snippet}
 		</NavItem>
 	</nav>
 

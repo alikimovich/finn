@@ -1,0 +1,100 @@
+Add a short design-system section to this project's agent guide. The
+goal: any fresh agent walking into the repo immediately knows (a) this
+is a design-system project, (b) the two cardinal rules, (c) where the
+inventory and recipes live, (d) the check command. Recipes,
+anti-patterns, per-component prop docs, and token values live
+elsewhere — CLAUDE.md is the map that points at them.
+
+WHERE TO WRITE:
+  - If `CLAUDE.md` or `AGENTS.md` exists at the repo root, ADD a
+    design-system section near the top (after any project boilerplate).
+  - If neither exists, CREATE `CLAUDE.md` at the repo root with this
+    section as its only content.
+  - If a stale design-system section already exists, REPLACE it —
+    don't append a second one.
+
+INTROSPECT FIRST:
+  - Framework + package manager (read package.json).
+  - Component library directory and the canonical import path
+    (e.g. `import { Button } from '$lib/components'`).
+  - Token stylesheet (e.g. `src/app.css`).
+  - Whether the build-with-design-system skill exists at
+    `.claude/skills/build-with-design-system/SKILL.md` (note its
+    absence if missing — don't fabricate the pointer).
+  - The check command (package.json scripts; typically `bun run check`).
+  - Whether an ESLint gate exists (`eslint.config.*` + `eslint-rules/`).
+  - The primary layout primitive name(s) (Stack, VStack, Column,
+    whatever the repo calls vertical layout).
+
+PRODUCE A SECTION with five parts, in this order. Keep the WHOLE
+section to ≤ ~50 lines. Imperatives, not prose.
+
+1) ONE-LINE PROJECT SHAPE.
+   "{framework} + {language}, plain CSS with design tokens. No
+   Tailwind, no CSS-in-JS." Adapt to the real stack. Skip if the
+   existing CLAUDE.md already says this above the section.
+
+2) THE TWO RULES (the only non-pointer content).
+   Exactly two bullets:
+     - **No magic values.** Never write a px / hex / rgba / duration /
+       radius literal in component or route CSS. Use a token from
+       <stylesheet>. If the right token doesn't exist, add one first.
+     - **Prefer composition over ad-hoc CSS.** If you'd write
+       `display: flex; flex-direction: column; gap: …`, use
+       <real layout primitive name>. Drop to raw CSS only when a
+       primitive can't express the layout.
+   End with one line: "Recipes and anti-patterns:
+   `.claude/skills/build-with-design-system/SKILL.md`."
+   Omit the skill pointer if the file doesn't exist yet.
+
+3) WHERE THINGS LIVE.
+   3–5 bullets, naming real files. Names, not values:
+     - Components: <library dir>. Every primitive carries its own
+       docs at the top of the file (`@component` block + per-prop
+       JSDoc). Read those before using a primitive you haven't used.
+     - Canonical import: `import { … } from '<path>'`.
+     - Tokens: <stylesheet>. Categories: <list — color, space,
+       radius, type, motion…>.
+     - Recipes / anti-patterns / Figma+sketch translation:
+       <skill path>. (Omit if absent.)
+     - Lint gate: <eslint config + plugin path>. (Omit if absent.)
+
+4) WORKFLOW FOR UI CHANGES (≤5 numbered steps).
+     1. Load the build-with-design-system skill.
+     2. Open the source of any primitive you haven't used for its
+        `@component` block + JSDoc.
+     3. Write the route or component.
+     4. Run `<check command>`.
+     5. Fix violations — never `// eslint-disable` to silence them.
+
+5) ADDING A NEW PRIMITIVE OR TOKEN.
+   One sentence + a pointer:
+   "When adding a primitive or token, follow the patterns in
+   `.claude/skills/build-with-design-system/SKILL.md` and update the
+   primitive's `@component` block / the token's reference row in the
+   same PR." Don't reproduce the checklists from the skill here.
+
+STYLE RULES for the section:
+  - Imperatives over descriptions. "Use Stack for vertical layout."
+    not "Stack is the primitive used for vertical layout."
+  - No token VALUES (they rot). Use token NAMES.
+  - No full code snippets. The skill has them.
+  - No inventory table. The component directory + JSDoc are the
+    inventory.
+  - No history, no rationale, no marketing, no emojis.
+  - Use REAL names and REPO-RELATIVE paths from the repo — never
+    placeholders like `<MyButton>` or absolute `/Users/...` paths.
+
+CONSTRAINTS:
+  - Total section length: ≤ ~50 lines (excluding any existing
+    CLAUDE.md content outside the section).
+  - If a referenced file doesn't exist (no skill yet, no ESLint
+    yet), OMIT that pointer rather than naming a file the agent
+    can't open.
+  - Don't widen scope. This section is for design-system pointers.
+    Other CLAUDE.md content (testing, deploy, repo conventions) is
+    out of scope — preserve it untouched.
+
+When done, report: file path written/edited, section line count, the
+real names used (primitives, token categories, check command, skill
+path), and any pointers omitted because the target file doesn't exist.
